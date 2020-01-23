@@ -172,11 +172,15 @@ void updateCamera() {
 	myGraphics.cameraFront = glm::normalize(front);
 
 	// Update movement using the keys
-	GLfloat cameraSpeed = 1.0f * deltaTime;
+	GLfloat cameraSpeed = 20.0f * deltaTime;
 	if (keyStatus[GLFW_KEY_W]) myGraphics.cameraPosition += cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_S]) myGraphics.cameraPosition -= cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
+	/**/
+	if (keyStatus[GLFW_KEY_SPACE]) myGraphics.cameraPosition += glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed;
+	if (keyStatus[GLFW_KEY_LEFT_SHIFT]) myGraphics.cameraPosition -= glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed;
+	/**/
 
 	// IMPORTANT PART
 	// Calculate my view matrix using the lookAt helper function
