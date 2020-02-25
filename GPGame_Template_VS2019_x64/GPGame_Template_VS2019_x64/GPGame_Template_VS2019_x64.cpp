@@ -13,6 +13,8 @@
 // Standard C++ libraries
 #include <iostream>
 #include <vector>
+#include <chrono>
+#include <thread>
 using namespace std;
 
 // Helper graphic libraries
@@ -27,8 +29,8 @@ using namespace std;
 
 // MAIN FUNCTIONS
 void startup();
-void updateCamera();
-void updateSceneElements();
+void updateCamera(float& forward, float& backward, float& left);
+void updateSceneElements(float& forward, float& backward, float& left);
 void renderScene();
 
 // CALLBACK FUNCTIONS
@@ -57,13 +59,18 @@ Arrow       arrowZ;
 Cube        myFloor;
 Line        myLine;
 Cylinder    myCylinder;
+Cube		secondCube;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
+float alea = 0.0f;
 
 
 int main()
 {
+	float xpos = 0.0f;
+	float ypos = 0.5f;
+	float zpos = 0.0f;
 	int errorGraphics = myGraphics.Init();			// Launch window and graphics context
 	if (errorGraphics) return 0;					// Close if something went wrong...
 
@@ -75,15 +82,15 @@ int main()
 	while (!quit) {
 
 		// Update the camera transform based on interactive inputs or by following a predifined path.
-		updateCamera();
+		updateCamera(xpos, ypos, zpos);
 
 		// Update position, orientations and any other relevant visual state of any dynamic elements in the scene.
-		updateSceneElements();
+		updateSceneElements(xpos, ypos, zpos);
 
 		// Render a still frame into an off-screen frame buffer known as the backbuffer.
 		renderScene();
 
-		// Swap the back buffer with the front buffer, making the most recently rendered image visible on-screen.
+		// Swap the back buffer with sthe front buffer, making the most recently rendered image visible on-screen.
 		glfwSwapBuffers(myGraphics.window);        // swap buffers (avoid flickering and tearing)
 
 	}
@@ -118,6 +125,9 @@ void startup() {
 	// Load Geometry examples
 	myCube.Load();
 
+	secondCube.Load();
+	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
+
 	mySphere.Load();
 	mySphere.fillColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);    // You can change the shape fill colour, line colour or linewidth
 
@@ -144,7 +154,7 @@ void startup() {
 
 }
 
-void updateCamera() {
+void updateCamera(float& x, float& y, float& z) {
 
 	// calculate movement for FPS camera
 	GLfloat xoffset = myGraphics.mouseX - myGraphics.cameraLastX;
@@ -172,15 +182,27 @@ void updateCamera() {
 	myGraphics.cameraFront = glm::normalize(front);
 
 	// Update movement using the keys
-	GLfloat cameraSpeed = 20.0f * deltaTime;
+	GLfloat cameraSpeed = 3.0f * deltaTime;
 	if (keyStatus[GLFW_KEY_W]) myGraphics.cameraPosition += cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_S]) myGraphics.cameraPosition -= cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
-	/**/
-	if (keyStatus[GLFW_KEY_SPACE]) myGraphics.cameraPosition += glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed;
-	if (keyStatus[GLFW_KEY_LEFT_SHIFT]) myGraphics.cameraPosition -= glm::vec3(0.0f, 1.0f, 0.0f) * cameraSpeed;
-	/**/
+	if (keyStatus[GLFW_KEY_UP]) {
+		z += 0.01f;
+	}
+	if (keyStatus[GLFW_KEY_DOWN]) {
+		z -= 0.01f;
+	}
+
+	if (keyStatus[GLFW_KEY_LEFT]) {
+		x += 0.01f;
+	}
+
+	if (keyStatus[GLFW_KEY_RIGHT]) {
+		x -= 0.01f;
+	}
+
+	
 
 	// IMPORTANT PART
 	// Calculate my view matrix using the lookAt helper function
@@ -191,7 +213,7 @@ void updateCamera() {
 	}
 }
 
-void updateSceneElements() {
+void updateSceneElements(float& x, float& y, float& z) {
 
 	glfwPollEvents();                                // poll callbacks
 
@@ -208,6 +230,28 @@ void updateSceneElements() {
 		glm::mat4(1.0f);
 	myCube.mv_matrix = myGraphics.viewMatrix * mv_matrix_cube;
 	myCube.proj_matrix = myGraphics.proj_matrix;
+
+	// Calculate SecondeCube Position
+	
+	int randi = rand() % 100;
+	if (randi == 3) {
+		alea += (float)rand() / (float)(RAND_MAX / 255);
+	}
+
+	if (randi == 4) {
+		alea -= (float)rand() / (float)(RAND_MAX / 1);
+	}
+	float r = (float)rand() / (float)(RAND_MAX / 4);
+	float g = (float)rand() / (float)(RAND_MAX / 4);
+	float b = (float)rand() / (float)(RAND_MAX / 4); 
+	secondCube.Load();
+	secondCube.fillColor = glm::vec4(r, g, b, 1.0f);
+	glm::mat4 mv_matrix_cube2 =
+		glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(10.0f) * 
+		glm::scale(glm::vec3(1.0f, 1.0f, 1.0f));
+	secondCube.mv_matrix = myGraphics.viewMatrix * mv_matrix_cube2;
+	secondCube.proj_matrix = myGraphics.proj_matrix;
 
 	// calculate Sphere movement
 	glm::mat4 mv_matrix_sphere =
@@ -277,6 +321,7 @@ void renderScene() {
 	// Draw objects in screen
 	myFloor.Draw();
 	myCube.Draw();
+	secondCube.Draw();
 	mySphere.Draw();
 
 	arrowX.Draw();
