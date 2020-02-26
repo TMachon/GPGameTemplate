@@ -160,9 +160,11 @@
     <ClCompile Include="GPGame_Template_VS2019_x64.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="shapes.cpp" />
+    <ClCompile Include="tank.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphics.h" />
+    <ClInclude Include="tank.h" />
     <ClInclude Include="shapes.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -26,6 +26,7 @@ using namespace std;
 #include <glm/gtx/transform.hpp>
 #include "graphics.h"
 #include "shapes.h"
+#include "tank.h"
 
 // MAIN FUNCTIONS
 void startup();
@@ -60,7 +61,10 @@ Arrow       arrowZ;
 Cube        myFloor;
 Line        myLine;
 Cylinder    myCylinder;
+
+//USER
 Cube		secondCube;
+Tank		player;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -127,9 +131,6 @@ void startup() {
 	// Load Geometry examples
 	myCube.Load();
 
-	secondCube.Load();
-	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
-
 	mySphere.Load();
 	mySphere.fillColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);    // You can change the shape fill colour, line colour or linewidth
 
@@ -154,6 +155,13 @@ void startup() {
 	// Optimised Graphics
 	myGraphics.SetOptimisations();        // Cull and depth testing
 
+	//USER
+
+	secondCube.Load();
+	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
+
+	player = Tank();
+	player.startup(myGraphics);
 }
 
 void updateCamera(float& x, float& y, float& z) {
@@ -312,6 +320,10 @@ void updateSceneElements(float& x, float& y, float& z) {
 
 	t += 0.01f; // increment movement variable
 
+	//USER
+
+	player.move(myGraphics);
+
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
 
@@ -333,6 +345,9 @@ void renderScene() {
 
 	myLine.Draw();
 	myCylinder.Draw();
+
+	//USER
+	player.draw();
 }
 
 
