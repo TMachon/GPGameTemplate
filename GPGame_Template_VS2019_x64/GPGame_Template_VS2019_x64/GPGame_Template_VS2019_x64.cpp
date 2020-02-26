@@ -43,6 +43,7 @@ void onMouseWheelCallback(GLFWwindow* window, double xoffset, double yoffset);
 // VARIABLES
 bool        quit = false;
 float       deltaTime = 0.0f;    // Keep track of time per frame.
+float		myDeltaTime = 0.0f;
 float       lastTime = 0.0f;    // variable to keep overall time.
 bool        keyStatus[1024];    // Hold key status.
 bool		mouseEnabled = true; // keep track of mouse toggle.
@@ -64,6 +65,7 @@ Cube		secondCube;
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
 float alea = 0.0f;
+float xrand = 0.0;
 
 
 int main()
@@ -221,31 +223,32 @@ void updateSceneElements(float& x, float& y, float& z) {
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime - lastTime;                // Calculate delta time
 	lastTime = currentTime;                            // Save for next frame calculations.
-
+	myDeltaTime += currentTime;
+	
+	cout << myDeltaTime << " " ;
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-
+	
+	if (myDeltaTime > 500) {
+		if (rand() % 99 > 50) {
+			xrand += (float)rand() / (float)(RAND_MAX / 0.1f);
+		}
+		else {
+			xrand -= (float)rand() / (float)(RAND_MAX / 0.1f);
+		}
+		myDeltaTime = 0.0f;
+	}
 	// Calculate Cube position
 	glm::mat4 mv_matrix_cube =
-		glm::translate(glm::vec3(2.0f, 0.5f, 0.0f)) *
+		glm::translate(glm::vec3(2.0f+xrand, 0.5f, 0.0f+xrand)) *
 		glm::mat4(1.0f);
 	myCube.mv_matrix = myGraphics.viewMatrix * mv_matrix_cube;
 	myCube.proj_matrix = myGraphics.proj_matrix;
 
 	// Calculate SecondeCube Position
-	
+	//alea -= (float)rand() / (float)(RAND_MAX / 1);
 	int randi = rand() % 100;
-	if (randi == 3) {
-		alea += (float)rand() / (float)(RAND_MAX / 255);
-	}
 
-	if (randi == 4) {
-		alea -= (float)rand() / (float)(RAND_MAX / 1);
-	}
-	float r = (float)rand() / (float)(RAND_MAX / 4);
-	float g = (float)rand() / (float)(RAND_MAX / 4);
-	float b = (float)rand() / (float)(RAND_MAX / 4); 
-	secondCube.Load();
-	secondCube.fillColor = glm::vec4(r, g, b, 1.0f);
+	
 	glm::mat4 mv_matrix_cube2 =
 		glm::translate(glm::vec3(x, y, z)) *
 		glm::mat4(10.0f) * 
