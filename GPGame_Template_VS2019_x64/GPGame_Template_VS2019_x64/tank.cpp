@@ -13,6 +13,10 @@
 
 float x, y, z;
 
+float x_size;
+float y_size;
+float z_size;
+
 Cube base;
 Cube head;
 Cube cannon;
@@ -26,6 +30,10 @@ Tank::Tank() {
 	x = 1.0f;
 	y = 0.5f;
 	z = 1.0f;
+	
+	x_size = 1.0f;
+	y_size = 1.0f;
+	z_size = 1.0f;
 
 }
 
@@ -88,26 +96,50 @@ void Tank::render() {
 
 }
 
+float Tank::getX() {
+	return x;
+}
+
+float Tank::getY() {
+	return y;
+}
+
+float Tank::getZ() {
+	return z;
+}
+
+float Tank::getXSize() {
+	return x_size;
+}
+
+float Tank::getYSize() {
+	return y_size;
+}
+
+float Tank::getZSize() {
+	return z_size;
+}
+
 
 // PRIVATE
 
 glm::mat4 Tank::getBaseMatrix() {
 	glm::mat4 matrix = glm::translate(glm::vec3(x, y, z)) *
-		glm::mat4(10.0f) *
-		glm::scale(glm::vec3(1.5f, 0.7f, 1.0f));
+		glm::mat4(1.0f) *
+		glm::scale(glm::vec3(x_size, y_size, z_size));
 	return matrix;
 }
 
 glm::mat4 Tank::getHeadMatrix() {
-	glm::mat4 matrix = glm::translate(glm::vec3(x, y + 0.5f, z))*
-		glm::mat4(10.0f)*
+	glm::mat4 matrix = glm::translate(glm::vec3(x, y_size+0.25f, z))*
+		glm::mat4(1.0f)*
 		glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
 	return matrix;
 }
 
 glm::mat4 Tank::getCannonMatrix() {
-	glm::mat4 matrix = glm::translate(glm::vec3(x + 1.0f, y + 0.6f, z))*
-		glm::mat4(10.0f)*
-		glm::scale(glm::vec3(1.5f, 0.2f, 0.2f));
+	glm::mat4 matrix = glm::translate(glm::vec3(x + 0.5f, y_size + 0.25f, z))*
+		glm::mat4(1.0f)*
+		glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
 	return matrix;
 }

@@ -198,6 +198,7 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	
+
 	if (keyStatus[GLFW_KEY_UP]) {
 		player.move(UP);
 	}
@@ -208,7 +209,21 @@ void updateMovement(float& x, float& y, float& z) {
 		player.move(LEFT);
 	}
 	if (keyStatus[GLFW_KEY_RIGHT]) {
-		player.move(RIGHT);
+		if (player.getX() - player.getXSize() / 2 < 0.5f) {
+			if (player.getZ() > 0.0f) {
+				if (player.getZ() - player.getZSize() / 2 > 0.5f) {
+					player.move(RIGHT);
+				}
+			}
+			else {
+				if (player.getZ() + player.getZSize() / 2 < -0.5f) {
+					player.move(RIGHT);
+				}
+			}
+		}
+		else {
+			player.move(RIGHT);
+		}
 	}
 
 	
@@ -334,16 +349,16 @@ void renderScene() {
 
 	// Draw objects in screen
 	myFloor.Draw();
-	myCube.Draw();
+	//myCube.Draw();
 	secondCube.Draw();
 	mySphere.Draw();
 
-	arrowX.Draw();
-	arrowY.Draw();
-	arrowZ.Draw();
+	//arrowX.Draw();
+	//arrowY.Draw();
+	//arrowZ.Draw();
 
-	myLine.Draw();
-	myCylinder.Draw();
+	//myLine.Draw();
+	//myCylinder.Draw();
 
 	//USER
 	player.render();

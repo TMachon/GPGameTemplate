@@ -29,6 +29,12 @@ public:
 	void startup(Graphics myGraphics, bool player);
 	void sceneUpdate(Graphics myGraphics);
 	void render();
+	float getX();
+	float getY();
+	float getZ();
+	float getXSize();
+	float getYSize();
+	float getZSize();
 
 private:
 	glm::mat4 getBaseMatrix();
