@@ -30,7 +30,7 @@ using namespace std;
 
 // MAIN FUNCTIONS
 void startup();
-void updateCamera(float& forward, float& backward, float& left);
+void updateMovement(float& forward, float& backward, float& left);
 void updateSceneElements(float& forward, float& backward, float& left);
 void renderScene();
 
@@ -88,7 +88,7 @@ int main()
 	while (!quit) {
 
 		// Update the camera transform based on interactive inputs or by following a predifined path.
-		updateCamera(xpos, ypos, zpos);
+		updateMovement(xpos, ypos, zpos);
 
 		// Update position, orientations and any other relevant visual state of any dynamic elements in the scene.
 		updateSceneElements(xpos, ypos, zpos);
@@ -161,10 +161,10 @@ void startup() {
 	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
 
 	player = Tank();
-	player.startup(myGraphics);
+	player.startup(myGraphics, true);
 }
 
-void updateCamera(float& x, float& y, float& z) {
+void updateMovement(float& x, float& y, float& z) {
 
 	// calculate movement for FPS camera
 	GLfloat xoffset = myGraphics.mouseX - myGraphics.cameraLastX;
@@ -197,19 +197,18 @@ void updateCamera(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_S]) myGraphics.cameraPosition -= cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
+	
 	if (keyStatus[GLFW_KEY_UP]) {
-		z += 0.01f;
+		player.move(UP);
 	}
 	if (keyStatus[GLFW_KEY_DOWN]) {
-		z -= 0.01f;
+		player.move(DOWN);
 	}
-
 	if (keyStatus[GLFW_KEY_LEFT]) {
-		x += 0.01f;
+		player.move(LEFT);
 	}
-
 	if (keyStatus[GLFW_KEY_RIGHT]) {
-		x -= 0.01f;
+		player.move(RIGHT);
 	}
 
 	
@@ -322,7 +321,7 @@ void updateSceneElements(float& x, float& y, float& z) {
 
 	//USER
 
-	player.move(myGraphics);
+	player.sceneUpdate(myGraphics);
 
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
@@ -347,7 +346,7 @@ void renderScene() {
 	myCylinder.Draw();
 
 	//USER
-	player.draw();
+	player.render();
 }
 
 

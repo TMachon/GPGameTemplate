@@ -19,9 +19,7 @@ Cube cannon;
 
 glm::vec4 color;
 
-glm::mat4 matrix_init_tank_base;
-glm::mat4 matrix_init_tank_head;
-glm::mat4 matrix_init_tank_cannon;
+// PUBLIC
 
 Tank::Tank() {
 
@@ -29,25 +27,16 @@ Tank::Tank() {
 	y = 0.5f;
 	z = 1.0f;
 
-	color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f);
-
-	matrix_init_tank_base = 
-		glm::translate(glm::vec3(x, y, z)) *
-		glm::mat4(10.0f) *
-		glm::scale(glm::vec3(1.5f, 0.7f, 1.0f));
-
-	matrix_init_tank_head =
-		glm::translate(glm::vec3(x, y+0.5f, z)) *
-		glm::mat4(10.0f) *
-		glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
-
-	matrix_init_tank_cannon =
-		glm::translate(glm::vec3(x+1.0f, y + 0.6f, z)) *
-		glm::mat4(10.0f) *
-		glm::scale(glm::vec3(1.5f, 0.2f, 0.2f));
 }
 
-void Tank::startup(Graphics myGraphics) {
+void Tank::startup(Graphics myGraphics, bool player) {
+
+	if (player) {
+		color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f);
+	}
+	else {
+		color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f);
+	}
 
 	base.Load();
 	head.Load();
@@ -58,22 +47,67 @@ void Tank::startup(Graphics myGraphics) {
 	cannon.fillColor = color;
 }
 
-void Tank::move(Graphics myGraphics) {
+void Tank::move(int movement) {
 
-	base.mv_matrix = myGraphics.viewMatrix * matrix_init_tank_base;
-	base.proj_matrix = myGraphics.proj_matrix;
+	if (movement == UP) {
+		z += 0.01f;
+	}
 
-	head.mv_matrix = myGraphics.viewMatrix * matrix_init_tank_head;
-	head.proj_matrix = myGraphics.proj_matrix;
+	if (movement == DOWN) {
+		z -= 0.01f;
+	}
 
-	cannon.mv_matrix = myGraphics.viewMatrix * matrix_init_tank_cannon;
-	cannon.proj_matrix = myGraphics.proj_matrix;
+	if (movement == RIGHT) {
+		x -= 0.01f;
+	}
+
+	if (movement == LEFT) {
+		x += 0.01f;
+	}
+
 }
 
-void Tank::draw() {
+void Tank::sceneUpdate(Graphics myGraphics) {
+
+	base.mv_matrix = myGraphics.viewMatrix * getBaseMatrix();
+	base.proj_matrix = myGraphics.proj_matrix;
+
+	head.mv_matrix = myGraphics.viewMatrix * getHeadMatrix();
+	head.proj_matrix = myGraphics.proj_matrix;
+
+	cannon.mv_matrix = myGraphics.viewMatrix * getCannonMatrix();
+	cannon.proj_matrix = myGraphics.proj_matrix;
+
+}
+
+void Tank::render() {
 
 	base.Draw();
 	head.Draw();
 	cannon.Draw();
 
+}
+
+
+// PRIVATE
+
+glm::mat4 Tank::getBaseMatrix() {
+	glm::mat4 matrix = glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(10.0f) *
+		glm::scale(glm::vec3(1.5f, 0.7f, 1.0f));
+	return matrix;
+}
+
+glm::mat4 Tank::getHeadMatrix() {
+	glm::mat4 matrix = glm::translate(glm::vec3(x, y + 0.5f, z))*
+		glm::mat4(10.0f)*
+		glm::scale(glm::vec3(0.5f, 0.5f, 0.5f));
+	return matrix;
+}
+
+glm::mat4 Tank::getCannonMatrix() {
+	glm::mat4 matrix = glm::translate(glm::vec3(x + 1.0f, y + 0.6f, z))*
+		glm::mat4(10.0f)*
+		glm::scale(glm::vec3(1.5f, 0.2f, 0.2f));
+	return matrix;
 }
