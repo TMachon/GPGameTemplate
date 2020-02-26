@@ -35,6 +35,12 @@ public:
 	float getXSize();
 	float getYSize();
 	float getZSize();
+	
+	glm::vec4 getTopLeft();
+	glm::vec4 getTopRight();
+	glm::vec4 getBottomLeft();
+	glm::vec4 getBottomRight();
+
 
 private:
 	glm::mat4 getBaseMatrix();

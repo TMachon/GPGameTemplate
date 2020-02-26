@@ -19,14 +19,19 @@ using namespace std;
 
 // Helper graphic libraries
 #include <GL/glew.h>
-
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
+
+#include <list>
+
 #include "graphics.h"
 #include "shapes.h"
 #include "tank.h"
+#include "wall.h"
+
+#define NB_WALLS 2
 
 // MAIN FUNCTIONS
 void startup();
@@ -66,11 +71,17 @@ Cylinder    myCylinder;
 Cube		secondCube;
 Tank		player;
 
+Wall	listOfWalls[NB_WALLS];
+
+bool		canGoUp;
+bool		canGoDown;
+bool		canGoRight;
+bool		canGoLeft;
+
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
 float alea = 0.0f;
 float xrand = 0.0;
-
 
 int main()
 {
@@ -111,6 +122,7 @@ int main()
 }
 
 void startup() {
+
 	// Keep track of the running time
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime;                        // start delta time
@@ -162,6 +174,17 @@ void startup() {
 
 	player = Tank();
 	player.startup(myGraphics, true);
+
+	for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[1] = Wall();
+	}
+	listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
+	listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
+
+	canGoUp = true;
+	canGoDown = true;
+	canGoRight = true;
+	canGoLeft = true;
 }
 
 void updateMovement(float& x, float& y, float& z) {
@@ -198,32 +221,37 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	
+	canGoUp = true;
+	canGoDown = true;
+	canGoRight = true;
+	canGoLeft = true;
+	std::list<Wall*>::iterator itW;
+	/**/
+	for (int i = 0; i < NB_WALLS; i++) {
 
-	if (keyStatus[GLFW_KEY_UP]) {
+		//on veut aller a droite
+		if (player.getX() - player.getXSize()/2 < listOfWalls[i].getX() + listOfWalls[i].getXSize()/2) {
+			canGoRight = false;
+		}
+
+		//
+
+		//
+
+		//
+	}
+	/**/
+	if (keyStatus[GLFW_KEY_UP] && canGoUp) {
 		player.move(UP);
 	}
-	if (keyStatus[GLFW_KEY_DOWN]) {
+	if (keyStatus[GLFW_KEY_DOWN] && canGoDown) {
 		player.move(DOWN);
 	}
-	if (keyStatus[GLFW_KEY_LEFT]) {
-		player.move(LEFT);
+	if (keyStatus[GLFW_KEY_RIGHT] && canGoRight) {
+		player.move(RIGHT);
 	}
-	if (keyStatus[GLFW_KEY_RIGHT]) {
-		if (player.getX() - player.getXSize() / 2 < 0.5f) {
-			if (player.getZ() > 0.0f) {
-				if (player.getZ() - player.getZSize() / 2 > 0.5f) {
-					player.move(RIGHT);
-				}
-			}
-			else {
-				if (player.getZ() + player.getZSize() / 2 < -0.5f) {
-					player.move(RIGHT);
-				}
-			}
-		}
-		else {
-			player.move(RIGHT);
-		}
+	if (keyStatus[GLFW_KEY_LEFT] && canGoLeft) {
+		player.move(LEFT);
 	}
 
 	
@@ -337,7 +365,9 @@ void updateSceneElements(float& x, float& y, float& z) {
 	//USER
 
 	player.sceneUpdate(myGraphics);
-
+	for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[i].sceneUpdate(myGraphics);
+	}
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
 
@@ -362,6 +392,9 @@ void renderScene() {
 
 	//USER
 	player.render();
+	for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[i].render();
+	}
 }
 
 

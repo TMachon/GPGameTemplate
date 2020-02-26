@@ -120,6 +120,22 @@ float Tank::getZSize() {
 	return z_size;
 }
 
+glm::vec4 Tank::getTopLeft() {
+	return glm::vec4(x + x_size/2, y, z + z_size/2, 1.0f);
+}
+
+glm::vec4 Tank::getTopRight() {
+	return glm::vec4(x - x_size/2, y, z + z_size/2, 1.0f);
+}
+
+glm::vec4 Tank::getBottomLeft() {
+	return glm::vec4(x + x_size/2, y, z - z_size/2, 1.0f);
+}
+
+glm::vec4 Tank::getBottomRight() {
+	return glm::vec4(x - x_size/2, y, z - z_size/2, 1.0f);
+}
+
 
 // PRIVATE
 
