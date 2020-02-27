@@ -29,7 +29,6 @@ using namespace std;
 #include "graphics.h"
 #include "shapes.h"
 #include "tank.h"
-#include "wall.h"
 
 #define NB_WALLS 2
 
@@ -55,7 +54,7 @@ bool        keyStatus[1024];    // Hold key status.
 bool		mouseEnabled = true; // keep track of mouse toggle.
 
 // MAIN GRAPHICS OBJECT
-Graphics    myGraphics;        // Runing all the graphics in this object
+Graphics    myGraphics;
 
 // DEMO OBJECTS
 Cube        myCube;
@@ -69,9 +68,10 @@ Cylinder    myCylinder;
 
 //USER
 Cube		secondCube;
-Tank		player;
+Tank		*player;
+Tank		*test;
 
-Wall	listOfWalls[NB_WALLS];
+Tank	listOfWalls[NB_WALLS];
 
 bool		canGoUp;
 bool		canGoDown;
@@ -172,19 +172,33 @@ void startup() {
 	secondCube.Load();
 	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
 
-	player = Tank();
-	player.startup(myGraphics, true);
+	
+	//test = Tank();
+	test = new Tank(0.0f, 0.5f, 3.0f);
+	player = new Tank(1.0f, 0.5f, 1.0f);
 
-	for (int i = 0; i < NB_WALLS; i++) {
-		listOfWalls[1] = Wall();
-	}
-	listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
-	listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
+	player->startup(myGraphics, true);
+	test->startup(myGraphics, false);
+
+	/*for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[1] = Tank();
+	}*/
+	//listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
+	//listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
 
 	canGoUp = true;
 	canGoDown = true;
 	canGoRight = true;
 	canGoLeft = true;
+}
+
+bool checkCollision(Tank tank1, Tank tank2) {
+	return (tank1.x + tank1.x_size/2 > tank2.getBottomCornerLeft().x &&
+		tank1.getBottomCornerLeft().x < tank2.getTopRight().x &&
+		tank1.getTopRight().y > tank2.getBottomCornerLeft().y &&
+		tank1.getBottomCornerLeft().y < tank2.getTopRight().y &&
+		tank1.getTopRight().z > tank2.getBottomCornerLeft().z &&
+		tank1.getBottomCornerLeft().z < tank2.getTopRight().z);
 }
 
 void updateMovement(float& x, float& y, float& z) {
@@ -225,14 +239,15 @@ void updateMovement(float& x, float& y, float& z) {
 	canGoDown = true;
 	canGoRight = true;
 	canGoLeft = true;
-	std::list<Wall*>::iterator itW;
+	std::list<Tank*>::iterator itW;
 	/**/
 	for (int i = 0; i < NB_WALLS; i++) {
 
 		//on veut aller a droite
-		if (player.getX() - player.getXSize()/2 < listOfWalls[i].getX() + listOfWalls[i].getXSize()/2) {
+		/*if (player.getX() - player.getXSize()/2 < listOfWalls[i].getX() + listOfWalls[i].getXSize()/2) {
 			canGoRight = false;
-		}
+		}*/
+
 
 		//
 
@@ -241,17 +256,26 @@ void updateMovement(float& x, float& y, float& z) {
 		//
 	}
 	/**/
-	if (keyStatus[GLFW_KEY_UP] && canGoUp) {
-		player.move(UP);
+	if (keyStatus[GLFW_KEY_UP]) {
+		if (checkCollision(*player, *test)) {
+			player->move(UP);
+		}
+		
 	}
-	if (keyStatus[GLFW_KEY_DOWN] && canGoDown) {
-		player.move(DOWN);
+	if (keyStatus[GLFW_KEY_DOWN]) {
+		if (checkCollision(*player, *test)) {
+			player->move(DOWN);
+		}
 	}
-	if (keyStatus[GLFW_KEY_RIGHT] && canGoRight) {
-		player.move(RIGHT);
+	if (keyStatus[GLFW_KEY_RIGHT]) {
+		if (checkCollision(*player, *test)) {
+			player->move(RIGHT);
+		}
 	}
-	if (keyStatus[GLFW_KEY_LEFT] && canGoLeft) {
-		player.move(LEFT);
+	if (keyStatus[GLFW_KEY_LEFT]) {
+		if (checkCollision(*player, *test)) {
+			player->move(LEFT);
+		}
 	}
 
 	
@@ -274,8 +298,7 @@ void updateSceneElements(float& x, float& y, float& z) {
 	deltaTime = currentTime - lastTime;                // Calculate delta time
 	lastTime = currentTime;                            // Save for next frame calculations.
 	myDeltaTime += currentTime;
-	
-	cout << myDeltaTime << " " ;
+
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 	
 	if (myDeltaTime > 500) {
@@ -297,6 +320,14 @@ void updateSceneElements(float& x, float& y, float& z) {
 	// Calculate SecondeCube Position
 	//alea -= (float)rand() / (float)(RAND_MAX / 1);
 	int randi = rand() % 100;
+
+	/*glm::mat4 basepos = 
+		myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(1.0f) *
+		glm::scale(glm::vec3(player->x_size, player->y_size, player->z_size));
+	player->base.mv_matrix = myGraphics.viewMatrix * basepos;
+	player->base.proj_matrix = myGraphics.proj_matrix;*/
+
 
 	
 	glm::mat4 mv_matrix_cube2 =
@@ -358,16 +389,17 @@ void updateSceneElements(float& x, float& y, float& z) {
 		glm::translate(glm::vec3(1.0f, 0.5f, 2.0f)) *
 		glm::mat4(1.0f);
 	myLine.proj_matrix = myGraphics.proj_matrix;
-
+	player->sceneUpdate(myGraphics);
+	test->sceneUpdate(myGraphics);
 
 	t += 0.01f; // increment movement variable
 
 	//USER
 
-	player.sceneUpdate(myGraphics);
-	for (int i = 0; i < NB_WALLS; i++) {
+	//
+	/*for (int i = 0; i < NB_WALLS; i++) {
 		listOfWalls[i].sceneUpdate(myGraphics);
-	}
+	}*/
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
 
@@ -391,9 +423,16 @@ void renderScene() {
 	//myCylinder.Draw();
 
 	//USER
-	player.render();
+	player->render();
+	test->render();
+	player->head.Draw();
+	player->base.Draw();
+	player->cannon.Draw();
+	test->head.Draw();
+	test->base.Draw();
+	test->cannon.Draw();
 	for (int i = 0; i < NB_WALLS; i++) {
-		listOfWalls[i].render();
+		//listOfWalls[i].render();
 	}
 }
 

@@ -47,7 +47,7 @@ Tank::Tank(float x_int, float y_int, float z_int) {
 	z_size = 1.0f;
 }
 
-void Tank::startup(Graphics myGraphics, bool player) {
+void Tank::startup(Graphics& myGraphics, bool player) {
 
 	if (player) {
 		color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f);
@@ -85,9 +85,11 @@ void Tank::move(int movement) {
 
 }
 
-void Tank::sceneUpdate(Graphics myGraphics) {
+void Tank::sceneUpdate(Graphics& myGraphics) {
 
-	base.mv_matrix = myGraphics.viewMatrix * getBaseMatrix();
+	base.mv_matrix = myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(1.0f) *
+		glm::scale(glm::vec3(x_size, y_size, z_size)); 
 	base.proj_matrix = myGraphics.proj_matrix;
 
 	head.mv_matrix = myGraphics.viewMatrix * getHeadMatrix();
@@ -130,24 +132,26 @@ float Tank::getZSize() {
 	return z_size;
 }
 
-glm::vec4 Tank::getTopLeft() {
-	return glm::vec4(x + x_size/2, y + y_size/2, z + z_size/2, 1.0f);
+
+
+glm::vec3 Tank::getTopLeft() {
+	return glm::vec3(x + x_size/2, y + y_size/2, z + z_size/2);
 }
 
-glm::vec4 Tank::getTopRight() {
-	return glm::vec4(x - x_size/2, y + y_size / 2, z + z_size/2, 1.0f);
+glm::vec3 Tank::getTopRight() {
+	return glm::vec3(x - x_size/2, y + y_size / 2, z + z_size/2);
 }
 
-glm::vec4 Tank::getBottomLeft() {
-	return glm::vec4(x + x_size/2, y + y_size / 2, z - z_size/2, 1.0f);
+glm::vec3 Tank::getBottomLeft() {
+	return glm::vec3(x + x_size/2, y + y_size / 2, z - z_size/2);
 }
 
-glm::vec4 Tank::getBottomRight() {
-	return glm::vec4(x - x_size/2, y + y_size / 2, z - z_size/2, 1.0f);
+glm::vec3 Tank::getBottomRight() {
+	return glm::vec3(x - x_size/2, y + y_size / 2, z - z_size/2);
 }
 
-glm::vec4 Tank::getBottomCornerLeft() {
-	return glm::vec4(x + x_size / 2, y - y_size / 2, z - z_size / 2, 1.0f);
+glm::vec3 Tank::getBottomCornerLeft() {
+	return glm::vec3(x + x_size / 2, y - y_size / 2, z - z_size / 2);
 }
 
 

@@ -14,6 +14,7 @@ using namespace std;
 #include <glm/gtx/transform.hpp>
 
 #include "graphics.h"
+#include "shapes.h"
 
 #define UP 1
 #define DOWN 2
@@ -24,11 +25,20 @@ using namespace std;
 class Tank {
 
 public:
+
+	Cube base;
+	Cube head;
+	Cube cannon;
+	float x, y, z;
+	float x_size;
+	float y_size;
+	float z_size;
+
 	Tank();
 	Tank(float, float, float);
 	void move(int movement);
-	void startup(Graphics myGraphics, bool player);
-	void sceneUpdate(Graphics myGraphics);
+	void startup(Graphics& myGraphics, bool player);
+	void sceneUpdate(Graphics& myGraphics);
 	void render();
 	float getX();
 	float getY();
@@ -37,11 +47,11 @@ public:
 	float getYSize();
 	float getZSize();
 	
-	glm::vec4 getTopLeft();
-	glm::vec4 getTopRight();
-	glm::vec4 getBottomLeft();
-	glm::vec4 getBottomRight();
-	glm::vec4 getBottomCornerLeft();
+	glm::vec3 getTopLeft();
+	glm::vec3 getTopRight();
+	glm::vec3 getBottomLeft();
+	glm::vec3 getBottomRight();
+	glm::vec3 getBottomCornerLeft();
 
 
 private:
