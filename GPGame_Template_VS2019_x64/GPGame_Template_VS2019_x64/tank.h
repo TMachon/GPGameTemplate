@@ -25,6 +25,7 @@ class Tank {
 
 public:
 	Tank();
+	Tank(float, float, float);
 	void move(int movement);
 	void startup(Graphics myGraphics, bool player);
 	void sceneUpdate(Graphics myGraphics);
@@ -40,6 +41,7 @@ public:
 	glm::vec4 getTopRight();
 	glm::vec4 getBottomLeft();
 	glm::vec4 getBottomRight();
+	glm::vec4 getBottomCornerLeft();
 
 
 private:

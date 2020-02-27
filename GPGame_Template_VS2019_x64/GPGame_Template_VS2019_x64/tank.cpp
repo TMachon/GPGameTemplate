@@ -37,6 +37,16 @@ Tank::Tank() {
 
 }
 
+Tank::Tank(float x_int, float y_int, float z_int) {
+	x = x_int;
+	y = y_int;
+	z = z_int;
+
+	x_size = 1.0f;
+	y_size = 1.0f;
+	z_size = 1.0f;
+}
+
 void Tank::startup(Graphics myGraphics, bool player) {
 
 	if (player) {
@@ -121,19 +131,23 @@ float Tank::getZSize() {
 }
 
 glm::vec4 Tank::getTopLeft() {
-	return glm::vec4(x + x_size/2, y, z + z_size/2, 1.0f);
+	return glm::vec4(x + x_size/2, y + y_size/2, z + z_size/2, 1.0f);
 }
 
 glm::vec4 Tank::getTopRight() {
-	return glm::vec4(x - x_size/2, y, z + z_size/2, 1.0f);
+	return glm::vec4(x - x_size/2, y + y_size / 2, z + z_size/2, 1.0f);
 }
 
 glm::vec4 Tank::getBottomLeft() {
-	return glm::vec4(x + x_size/2, y, z - z_size/2, 1.0f);
+	return glm::vec4(x + x_size/2, y + y_size / 2, z - z_size/2, 1.0f);
 }
 
 glm::vec4 Tank::getBottomRight() {
-	return glm::vec4(x - x_size/2, y, z - z_size/2, 1.0f);
+	return glm::vec4(x - x_size/2, y + y_size / 2, z - z_size/2, 1.0f);
+}
+
+glm::vec4 Tank::getBottomCornerLeft() {
+	return glm::vec4(x + x_size / 2, y - y_size / 2, z - z_size / 2, 1.0f);
 }
 
 
