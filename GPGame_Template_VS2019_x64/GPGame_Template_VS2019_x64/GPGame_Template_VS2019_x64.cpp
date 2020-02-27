@@ -193,12 +193,17 @@ void startup() {
 }
 
 bool checkCollision(Tank tank1, Tank tank2) {
-	return (tank1.x + tank1.x_size/2 > tank2.getBottomCornerLeft().x &&
-		tank1.getBottomCornerLeft().x < tank2.getTopRight().x &&
-		tank1.getTopRight().y > tank2.getBottomCornerLeft().y &&
-		tank1.getBottomCornerLeft().y < tank2.getTopRight().y &&
-		tank1.getTopRight().z > tank2.getBottomCornerLeft().z &&
-		tank1.getBottomCornerLeft().z < tank2.getTopRight().z);
+	return (tank1.x + tank1.x_size / 2 > tank2.x - tank2.x_size / 2 &&
+		tank1.x - tank1.x_size / 2 < tank2.x + tank2.x_size / 2 &&
+		tank1.y + tank1.y_size / 2 > tank2.y - tank2.y_size / 2 &&
+		tank1.y - tank1.y_size / 2 < tank2.y + tank2.y_size / 2 &&
+		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2 &&
+		tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2);
+}
+
+bool checkUpCollision(Tank tank1, Tank tank2) {
+	return (tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2 &&
+		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2);
 }
 
 void updateMovement(float& x, float& y, float& z) {
@@ -257,23 +262,23 @@ void updateMovement(float& x, float& y, float& z) {
 	}
 	/**/
 	if (keyStatus[GLFW_KEY_UP]) {
-		if (checkCollision(*player, *test)) {
+		if (!checkUpCollision(*player, *test)) {
 			player->move(UP);
 		}
 		
 	}
 	if (keyStatus[GLFW_KEY_DOWN]) {
-		if (checkCollision(*player, *test)) {
+		if (!checkCollision(*player, *test)) {
 			player->move(DOWN);
 		}
 	}
 	if (keyStatus[GLFW_KEY_RIGHT]) {
-		if (checkCollision(*player, *test)) {
+		if (!checkCollision(*player, *test)) {
 			player->move(RIGHT);
 		}
 	}
 	if (keyStatus[GLFW_KEY_LEFT]) {
-		if (checkCollision(*player, *test)) {
+		if (!checkCollision(*player, *test)) {
 			player->move(LEFT);
 		}
 	}
