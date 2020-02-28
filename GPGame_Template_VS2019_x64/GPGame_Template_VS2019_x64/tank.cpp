@@ -23,6 +23,8 @@ Cube cannon;
 
 glm::vec4 color;
 
+char direction;
+
 // PUBLIC
 
 Tank::Tank() {
@@ -35,6 +37,7 @@ Tank::Tank() {
 	y_size = 1.0f;
 	z_size = 1.0f;
 
+	direction = 'u';
 }
 
 Tank::Tank(float x_int, float y_int, float z_int) {
@@ -69,18 +72,22 @@ void Tank::move(int movement) {
 
 	if (movement == UP) {
 		z += 0.01f;
+		direction = 'u';
 	}
 
 	if (movement == DOWN) {
 		z -= 0.01f;
+		direction = 'd';
 	}
 
 	if (movement == RIGHT) {
 		x -= 0.01f;
+		direction = 'r';
 	}
 
 	if (movement == LEFT) {
 		x += 0.01f;
+		direction = 'l';
 	}
 
 }
@@ -176,8 +183,26 @@ glm::mat4 Tank::getHeadMatrix() {
 }
 
 glm::mat4 Tank::getCannonMatrix() {
-	glm::mat4 matrix = glm::translate(glm::vec3(x + 0.5f, y_size + 0.25f, z))*
-		glm::mat4(1.0f)*
-		glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
+	glm::mat4 matrix;
+	if (direction == 'u') {
+		matrix = glm::translate(glm::vec3(x, y_size + 0.25f, z + 0.5f)) *
+			glm::mat4(1.0f) *
+			glm::scale(glm::vec3(0.2f, 0.2f, 0.5f));
+	}
+	else if (direction == 'd') {
+		matrix = glm::translate(glm::vec3(x, y_size + 0.25f, z - 0.5f)) *
+			glm::mat4(1.0f) *
+			glm::scale(glm::vec3(0.2f, 0.2f, 0.5f));
+	}
+	else if (direction == 'l') {
+		matrix = glm::translate(glm::vec3(x + 0.5f, y_size + 0.25f, z)) *
+			glm::mat4(1.0f) *
+			glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
+	}
+	else if (direction == 'r') {
+		matrix = glm::translate(glm::vec3(x - 0.5f, y_size + 0.25f, z)) *
+			glm::mat4(1.0f) *
+			glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
+	}
 	return matrix;
 }
