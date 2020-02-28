@@ -19,14 +19,18 @@ using namespace std;
 
 // Helper graphic libraries
 #include <GL/glew.h>
-
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/transform.hpp>
+
+#include <list>
+
 #include "graphics.h"
 #include "shapes.h"
 #include "tank.h"
+
+#define NB_WALLS 2
 
 // MAIN FUNCTIONS
 void startup();
@@ -50,7 +54,7 @@ bool        keyStatus[1024];    // Hold key status.
 bool		mouseEnabled = true; // keep track of mouse toggle.
 
 // MAIN GRAPHICS OBJECT
-Graphics    myGraphics;        // Runing all the graphics in this object
+Graphics    myGraphics;
 
 // DEMO OBJECTS
 Cube        myCube;
@@ -64,13 +68,21 @@ Cylinder    myCylinder;
 
 //USER
 Cube		secondCube;
-Tank		player;
+Tank		*player;
+Tank		*test;
+char		key;
+
+Tank	listOfWalls[NB_WALLS];
+
+bool		stuckUp;
+bool		stuckDown;
+bool		stuckRight;
+bool		stuckLeft;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
 float alea = 0.0f;
 float xrand = 0.0;
-
 
 int main()
 {
@@ -111,6 +123,7 @@ int main()
 }
 
 void startup() {
+
 	// Keep track of the running time
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime;                        // start delta time
@@ -160,8 +173,35 @@ void startup() {
 	secondCube.Load();
 	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
 
-	player = Tank();
-	player.startup(myGraphics, true);
+	
+	//test = Tank();
+	test = new Tank(0.0f, 0.5f, 3.0f);
+	player = new Tank(1.0f, 0.5f, 1.0f);
+
+	player->startup(myGraphics, true);
+	test->startup(myGraphics, false);
+
+	/*for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[1] = Tank();
+	}*/
+	//listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
+	//listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
+
+	stuckUp = true;
+	stuckDown = true;
+	stuckRight = true;
+	stuckLeft = true;
+	key = ' ';
+}
+
+bool checkCollision(Tank tank1, Tank tank2) {
+	return (tank1.x + tank1.x_size / 2 > tank2.x - tank2.x_size / 2 &&
+		tank1.x - tank1.x_size / 2 < tank2.x + tank2.x_size / 2 &&
+		tank1.y + tank1.y_size / 2 > tank2.y - tank2.y_size / 2 &&
+		tank1.y - tank1.y_size / 2 < tank2.y + tank2.y_size / 2 &&
+		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2 &&
+		tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2);
+		
 }
 
 void updateMovement(float& x, float& y, float& z) {
@@ -197,34 +237,64 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_S]) myGraphics.cameraPosition -= cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
-	
 
-	if (keyStatus[GLFW_KEY_UP]) {
-		player.move(UP);
-	}
-	if (keyStatus[GLFW_KEY_DOWN]) {
-		player.move(DOWN);
-	}
-	if (keyStatus[GLFW_KEY_LEFT]) {
-		player.move(LEFT);
-	}
-	if (keyStatus[GLFW_KEY_RIGHT]) {
-		if (player.getX() - player.getXSize() / 2 < 0.5f) {
-			if (player.getZ() > 0.0f) {
-				if (player.getZ() - player.getZSize() / 2 > 0.5f) {
-					player.move(RIGHT);
-				}
+	// if there is a collision
+	if (checkCollision(*player, *test)) {
+		while (checkCollision(*player, *test)) {
+			if (key == 'u') {
+				player->move(DOWN);
 			}
-			else {
-				if (player.getZ() + player.getZSize() / 2 < -0.5f) {
-					player.move(RIGHT);
-				}
+			else if (key == 'd') {
+				player->move(UP);
 			}
-		}
-		else {
-			player.move(RIGHT);
+			else if (key == 'r') {
+				player->move(LEFT);
+			}
+			else if (key == 'l') {
+				player->move(RIGHT);
+			}
+
 		}
 	}
+
+	// if there is no collision
+	else {
+		if (keyStatus[GLFW_KEY_UP]) {
+			key = 'u';
+			player->move(UP);
+		}
+		else if (keyStatus[GLFW_KEY_DOWN]) {
+			key = 'd';
+			player->move(DOWN);
+		}
+		else if (keyStatus[GLFW_KEY_RIGHT]) {
+			key = 'r';
+			player->move(RIGHT);
+		}
+		else if (keyStatus[GLFW_KEY_LEFT]) {
+			key = 'l';
+			player->move(LEFT);
+		}
+	}
+
+	cout << key << endl;
+
+	/**
+	stuckUp = false;
+	stuckDown = false;
+	stuckRight = false;
+	stuckLeft = false;
+	std::list<Tank*>::iterator itW;
+	/**
+	for (int i = 0; i < NB_WALLS; i++) {
+
+	}
+	/**
+	while (stuckUp) {
+		player->moveDebug(DOWN);
+		stuckUp = checkCollision(*player, *test);
+	}
+	/**/
 
 	
 
@@ -246,8 +316,7 @@ void updateSceneElements(float& x, float& y, float& z) {
 	deltaTime = currentTime - lastTime;                // Calculate delta time
 	lastTime = currentTime;                            // Save for next frame calculations.
 	myDeltaTime += currentTime;
-	
-	cout << myDeltaTime << " " ;
+
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 	
 	if (myDeltaTime > 500) {
@@ -269,6 +338,14 @@ void updateSceneElements(float& x, float& y, float& z) {
 	// Calculate SecondeCube Position
 	//alea -= (float)rand() / (float)(RAND_MAX / 1);
 	int randi = rand() % 100;
+
+	/*glm::mat4 basepos = 
+		myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(1.0f) *
+		glm::scale(glm::vec3(player->x_size, player->y_size, player->z_size));
+	player->base.mv_matrix = myGraphics.viewMatrix * basepos;
+	player->base.proj_matrix = myGraphics.proj_matrix;*/
+
 
 	
 	glm::mat4 mv_matrix_cube2 =
@@ -330,14 +407,17 @@ void updateSceneElements(float& x, float& y, float& z) {
 		glm::translate(glm::vec3(1.0f, 0.5f, 2.0f)) *
 		glm::mat4(1.0f);
 	myLine.proj_matrix = myGraphics.proj_matrix;
-
+	player->sceneUpdate(myGraphics);
+	test->sceneUpdate(myGraphics);
 
 	t += 0.01f; // increment movement variable
 
 	//USER
 
-	player.sceneUpdate(myGraphics);
-
+	//
+	/*for (int i = 0; i < NB_WALLS; i++) {
+		listOfWalls[i].sceneUpdate(myGraphics);
+	}*/
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
 
@@ -361,7 +441,17 @@ void renderScene() {
 	//myCylinder.Draw();
 
 	//USER
-	player.render();
+	player->render();
+	test->render();
+	player->head.Draw();
+	player->base.Draw();
+	player->cannon.Draw();
+	test->head.Draw();
+	test->base.Draw();
+	test->cannon.Draw();
+	for (int i = 0; i < NB_WALLS; i++) {
+		//listOfWalls[i].render();
+	}
 }
 
 

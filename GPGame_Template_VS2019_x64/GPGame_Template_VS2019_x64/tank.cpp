@@ -37,7 +37,17 @@ Tank::Tank() {
 
 }
 
-void Tank::startup(Graphics myGraphics, bool player) {
+Tank::Tank(float x_int, float y_int, float z_int) {
+	x = x_int;
+	y = y_int;
+	z = z_int;
+
+	x_size = 1.0f;
+	y_size = 1.0f;
+	z_size = 1.0f;
+}
+
+void Tank::startup(Graphics& myGraphics, bool player) {
 
 	if (player) {
 		color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f);
@@ -75,9 +85,31 @@ void Tank::move(int movement) {
 
 }
 
-void Tank::sceneUpdate(Graphics myGraphics) {
+void Tank::moveDebug(int movement) {
 
-	base.mv_matrix = myGraphics.viewMatrix * getBaseMatrix();
+	if (movement == UP) {
+		z += 0.02f;
+	}
+
+	if (movement == DOWN) {
+		z -= 0.02f;
+	}
+
+	if (movement == RIGHT) {
+		x -= 0.02f;
+	}
+
+	if (movement == LEFT) {
+		x += 0.02f;
+	}
+
+}
+
+void Tank::sceneUpdate(Graphics& myGraphics) {
+
+	base.mv_matrix = myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
+		glm::mat4(1.0f) *
+		glm::scale(glm::vec3(x_size, y_size, z_size)); 
 	base.proj_matrix = myGraphics.proj_matrix;
 
 	head.mv_matrix = myGraphics.viewMatrix * getHeadMatrix();
@@ -118,6 +150,12 @@ float Tank::getYSize() {
 
 float Tank::getZSize() {
 	return z_size;
+}
+
+void Tank::setPosition(float x_in, float y_in, float z_in) {
+	x = x_in;
+	y = y_in;
+	z = z_in;
 }
 
 
