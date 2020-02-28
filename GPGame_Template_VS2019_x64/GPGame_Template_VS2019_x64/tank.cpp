@@ -85,6 +85,26 @@ void Tank::move(int movement) {
 
 }
 
+void Tank::moveDebug(int movement) {
+
+	if (movement == UP) {
+		z += 0.02f;
+	}
+
+	if (movement == DOWN) {
+		z -= 0.02f;
+	}
+
+	if (movement == RIGHT) {
+		x -= 0.02f;
+	}
+
+	if (movement == LEFT) {
+		x += 0.02f;
+	}
+
+}
+
 void Tank::sceneUpdate(Graphics& myGraphics) {
 
 	base.mv_matrix = myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
@@ -132,26 +152,10 @@ float Tank::getZSize() {
 	return z_size;
 }
 
-
-
-glm::vec3 Tank::getTopLeft() {
-	return glm::vec3(x + x_size/2, y + y_size/2, z + z_size/2);
-}
-
-glm::vec3 Tank::getTopRight() {
-	return glm::vec3(x - x_size/2, y + y_size / 2, z + z_size/2);
-}
-
-glm::vec3 Tank::getBottomLeft() {
-	return glm::vec3(x + x_size/2, y + y_size / 2, z - z_size/2);
-}
-
-glm::vec3 Tank::getBottomRight() {
-	return glm::vec3(x - x_size/2, y + y_size / 2, z - z_size/2);
-}
-
-glm::vec3 Tank::getBottomCornerLeft() {
-	return glm::vec3(x + x_size / 2, y - y_size / 2, z - z_size / 2);
+void Tank::setPosition(float x_in, float y_in, float z_in) {
+	x = x_in;
+	y = y_in;
+	z = z_in;
 }
 
 

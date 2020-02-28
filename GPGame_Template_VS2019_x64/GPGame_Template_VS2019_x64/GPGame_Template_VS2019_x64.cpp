@@ -70,13 +70,14 @@ Cylinder    myCylinder;
 Cube		secondCube;
 Tank		*player;
 Tank		*test;
+char		key;
 
 Tank	listOfWalls[NB_WALLS];
 
-bool		canGoUp;
-bool		canGoDown;
-bool		canGoRight;
-bool		canGoLeft;
+bool		stuckUp;
+bool		stuckDown;
+bool		stuckRight;
+bool		stuckLeft;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -186,10 +187,11 @@ void startup() {
 	//listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
 	//listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
 
-	canGoUp = true;
-	canGoDown = true;
-	canGoRight = true;
-	canGoLeft = true;
+	stuckUp = true;
+	stuckDown = true;
+	stuckRight = true;
+	stuckLeft = true;
+	key = ' ';
 }
 
 bool checkCollision(Tank tank1, Tank tank2) {
@@ -199,11 +201,7 @@ bool checkCollision(Tank tank1, Tank tank2) {
 		tank1.y - tank1.y_size / 2 < tank2.y + tank2.y_size / 2 &&
 		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2 &&
 		tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2);
-}
-
-bool checkUpCollision(Tank tank1, Tank tank2) {
-	return (tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2 &&
-		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2);
+		
 }
 
 void updateMovement(float& x, float& y, float& z) {
@@ -239,49 +237,64 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_S]) myGraphics.cameraPosition -= cameraSpeed * myGraphics.cameraFront;
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
-	
-	canGoUp = true;
-	canGoDown = true;
-	canGoRight = true;
-	canGoLeft = true;
-	std::list<Tank*>::iterator itW;
-	/**/
-	for (int i = 0; i < NB_WALLS; i++) {
 
-		//on veut aller a droite
-		/*if (player.getX() - player.getXSize()/2 < listOfWalls[i].getX() + listOfWalls[i].getXSize()/2) {
-			canGoRight = false;
-		}*/
+	// if there is a collision
+	if (checkCollision(*player, *test)) {
+		while (checkCollision(*player, *test)) {
+			if (key == 'u') {
+				player->move(DOWN);
+			}
+			else if (key == 'd') {
+				player->move(UP);
+			}
+			else if (key == 'r') {
+				player->move(LEFT);
+			}
+			else if (key == 'l') {
+				player->move(RIGHT);
+			}
 
-
-		//
-
-		//
-
-		//
+		}
 	}
-	/**/
-	if (keyStatus[GLFW_KEY_UP]) {
-		if (!checkUpCollision(*player, *test)) {
+
+	// if there is no collision
+	else {
+		if (keyStatus[GLFW_KEY_UP]) {
+			key = 'u';
 			player->move(UP);
 		}
-		
-	}
-	if (keyStatus[GLFW_KEY_DOWN]) {
-		if (!checkCollision(*player, *test)) {
+		else if (keyStatus[GLFW_KEY_DOWN]) {
+			key = 'd';
 			player->move(DOWN);
 		}
-	}
-	if (keyStatus[GLFW_KEY_RIGHT]) {
-		if (!checkCollision(*player, *test)) {
+		else if (keyStatus[GLFW_KEY_RIGHT]) {
+			key = 'r';
 			player->move(RIGHT);
 		}
-	}
-	if (keyStatus[GLFW_KEY_LEFT]) {
-		if (!checkCollision(*player, *test)) {
+		else if (keyStatus[GLFW_KEY_LEFT]) {
+			key = 'l';
 			player->move(LEFT);
 		}
 	}
+
+	cout << key << endl;
+
+	/**
+	stuckUp = false;
+	stuckDown = false;
+	stuckRight = false;
+	stuckLeft = false;
+	std::list<Tank*>::iterator itW;
+	/**
+	for (int i = 0; i < NB_WALLS; i++) {
+
+	}
+	/**
+	while (stuckUp) {
+		player->moveDebug(DOWN);
+		stuckUp = checkCollision(*player, *test);
+	}
+	/**/
 
 	
 

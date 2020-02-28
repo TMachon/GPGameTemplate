@@ -37,6 +37,7 @@ public:
 	Tank();
 	Tank(float, float, float);
 	void move(int movement);
+	void moveDebug(int movement);
 	void startup(Graphics& myGraphics, bool player);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
@@ -46,12 +47,7 @@ public:
 	float getXSize();
 	float getYSize();
 	float getZSize();
-	
-	glm::vec3 getTopLeft();
-	glm::vec3 getTopRight();
-	glm::vec3 getBottomLeft();
-	glm::vec3 getBottomRight();
-	glm::vec3 getBottomCornerLeft();
+	void setPosition(float x_in, float y_in, float z_in);
 
 
 private:
