@@ -233,6 +233,8 @@ void checkMissileCollision() {
 		for (int j = 0; j < wallList.size(); j++) {
 			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
 				toRemove.push_back(missileList[i].getId());
+				cout << i << endl;
+				
 			}
 		}
 		for (int j = 0; j < tankList.size(); j++) {
@@ -245,8 +247,8 @@ void checkMissileCollision() {
 	/**/
 	for (int i = 0; i < toRemove.size(); i++) {
 		for (int j = 0; j < missileList.size(); j++) {
-			if (toRemove[i] == missileList[i].getId()) {
-				missileList.erase(missileList.begin()+i);
+			if (toRemove[i] == missileList[j].getId()) {
+				missileList.erase(missileList.begin() + j);
 			}
 		}
 	}
