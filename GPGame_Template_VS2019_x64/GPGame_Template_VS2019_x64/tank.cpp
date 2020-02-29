@@ -1,6 +1,8 @@
 #include "tank.h"
 #include <iostream>
 #include <sstream>
+#include <ctime>
+
 
 #include <GL/glew.h>
 
@@ -22,6 +24,10 @@ Tank::Tank() {
 	x_size = 1.0f;
 	y_size = 1.0f;
 	z_size = 1.0f;
+
+	same = 0;
+
+	id = std::time(nullptr);
 }
 
 Tank::Tank(float x_int, float y_int, float z_int) {
@@ -32,10 +38,15 @@ Tank::Tank(float x_int, float y_int, float z_int) {
 	x_size = 1.0f;
 	y_size = 1.0f;
 	z_size = 1.0f;
+
+	same = 0;
+
+	id = std::time(nullptr);
 }
 
-void Tank::startup(Graphics& myGraphics, bool player) {
+void Tank::startup(Graphics& myGraphics, bool player_in) {
 
+	player = player_in;
 	if (player) {
 		color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f);
 	}
@@ -52,13 +63,12 @@ void Tank::startup(Graphics& myGraphics, bool player) {
 	cannon.fillColor = color;
 }
 
-void Tank::move(int movement) {
+void Tank::move(int movement, bool updateMovement) {
 
-	last_movement = movement;
+	if (updateMovement) last_movement = movement;
 
 	if (movement == UP) {
 		z += 0.01f;
-		
 	}
 
 	if (movement == DOWN) {
@@ -211,6 +221,27 @@ int Tank::getLastMovement() {
 	return last_movement;
 }
 
+void Tank::resetSame() {
+	same = 0;
+}
+
+int Tank::getSame() {
+	return same;
+}
+
 void Tank::setLastMovement(int movement) {
 	last_movement = movement;
+}
+
+void Tank::incSame() {
+	same++;
+}
+
+
+int Tank::getId() {
+	return id;
+}
+
+bool Tank::isPlayer() {
+	return player;
 }

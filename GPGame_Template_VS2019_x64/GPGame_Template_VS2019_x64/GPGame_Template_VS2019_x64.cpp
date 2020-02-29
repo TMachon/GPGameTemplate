@@ -30,13 +30,15 @@ using namespace std;
 #include "shapes.h"
 #include "tank.h"
 #include "wall.h"
+#include "missile.h"
 
 #define NB_WALLS 2
 
 // MAIN FUNCTIONS
 void startup();
-void updateMovement(float& forward, float& backward, float& left);
-void updateSceneElements(float& forward, float& backward, float& left);
+void updateCamera();
+void updateMovement();
+void updateSceneElements();
 void renderScene();
 
 // CALLBACK FUNCTIONS
@@ -65,9 +67,12 @@ Tank		player;
 Tank		test;
 
 std::vector<Wall> wallList;
+std::vector<Tank> tankList;
 
 glm::vec3	defaultCameraPostion;
 GLfloat		defaultCameraPitch;
+
+std::vector<Missile> missileList;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -90,13 +95,19 @@ int main()
 	while (!quit) {
 
 		// Update the camera transform based on interactive inputs or by following a predifined path.
-		updateMovement(xpos, ypos, zpos);
+		
+
+		updateCamera();
+
+		updateMovement();
 
 		// Update position, orientations and any other relevant visual state of any dynamic elements in the scene.
-		updateSceneElements(xpos, ypos, zpos);
+		updateSceneElements();
 
 		// Render a still frame into an off-screen frame buffer known as the backbuffer.
 		renderScene();
+
+		
 
 		// Swap the back buffer with sthe front buffer, making the most recently rendered image visible on-screen.
 		glfwSwapBuffers(myGraphics.window);        // swap buffers (avoid flickering and tearing)
@@ -154,6 +165,7 @@ void startup() {
 
 	player.startup(myGraphics, true);
 	test.startup(myGraphics, false);
+	tankList.push_back(test);
 
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
@@ -169,7 +181,7 @@ void startup() {
 	wallList.push_back(wall4);
 }
 
-bool checkCollision(Tank tank1, Tank tank2) {
+bool checkCollisionTank(Tank tank1, Tank tank2) {
 	return (tank1.getX() + tank1.getXSize() / 2 > tank2.getX() - tank2.getXSize() / 2 &&
 		tank1.getX() - tank1.getXSize() / 2 < tank2.getX() + tank2.getXSize() / 2 &&
 		tank1.getY() + tank1.getYSize() / 2 > tank2.getY() - tank2.getYSize() / 2 &&
@@ -179,7 +191,39 @@ bool checkCollision(Tank tank1, Tank tank2) {
 		
 }
 
-void updateMovement(float& x, float& y, float& z) {
+bool checkCollisionWall(Tank tank, Wall wall) {
+	return (tank.getX() + tank.getXSize() / 2 > wall.getX() - wall.getXSize() / 2 &&
+		tank.getX() - tank.getXSize() / 2 < wall.getX() + wall.getXSize() / 2 &&
+		tank.getY() + tank.getYSize() / 2 > wall.getY() - wall.getYSize() / 2 &&
+		tank.getY() - tank.getYSize() / 2 < wall.getY() + wall.getYSize() / 2 &&
+		tank.getZ() + tank.getZSize() / 2 > wall.getZ() - wall.getZSize() / 2 &&
+		tank.getZ() - tank.getZSize() / 2 < wall.getZ() + wall.getZSize() / 2);
+}
+
+bool checkCollision(Tank tank) {
+	/**/
+	for (int i = 0; i < wallList.size(); i++) {
+		if (checkCollisionWall(tank, wallList[i])) {
+			return true;
+		}
+	}
+	/**/
+	for (int i = 0; i < tankList.size(); i++) {
+		if (tank.getId() != tankList[i].getId() && checkCollisionTank(tank, tankList[i])) {
+			return true;
+		}
+	}
+	/**/
+	if (!tank.isPlayer()) {
+		if (checkCollisionTank(tank, player)) {
+			return true;
+		}
+	}
+	/**/
+	return false;
+}
+
+void updateCamera() {
 
 	// calculate movement for FPS camera
 	GLfloat xoffset = myGraphics.mouseX - myGraphics.cameraLastX;
@@ -216,39 +260,7 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_A]) myGraphics.cameraPosition -= glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 
-	// if there is a collision
-	if (checkCollision(player, test)) {
-		while (checkCollision(player, test)) {
-			if (player.getLastMovement()==DOWN) {
-				player.move(UP);
-			}
-			else if (player.getLastMovement()==UP) {
-				player.move(DOWN);
-			}
-			else if (player.getLastMovement()==LEFT) {
-				player.move(RIGHT);
-			}
-			else if (player.getLastMovement()==RIGHT) {
-				player.move(LEFT);
-			}
-		}
-	}
 
-	// if there is no collision
-	else {
-		if (keyStatus[GLFW_KEY_UP]) {
-			player.move(UP);
-		}
-		else if (keyStatus[GLFW_KEY_DOWN]) {
-			player.move(DOWN);
-		}
-		else if (keyStatus[GLFW_KEY_RIGHT]) {
-			player.move(RIGHT);
-		}
-		else if (keyStatus[GLFW_KEY_LEFT]) {
-			player.move(LEFT);
-		}
-	}
 
 	// IMPORTANT PART
 	// Calculate my view matrix using the lookAt helper function
@@ -257,9 +269,102 @@ void updateMovement(float& x, float& y, float& z) {
 			myGraphics.cameraPosition + myGraphics.cameraFront,					// centre
 			myGraphics.cameraUp);												// up
 	}
+
 }
 
-void updateSceneElements(float& x, float& y, float& z) {
+void updateMovement() {
+	
+
+	//Player collision
+	// if there is a collision
+	if (checkCollision(player)) {
+		while (checkCollision(player)) {
+			if (player.getLastMovement() == DOWN) {
+				player.move(UP, false);
+			}
+			else if (player.getLastMovement() == UP) {
+				player.move(DOWN, false);
+			}
+			else if (player.getLastMovement() == LEFT) {
+				player.move(RIGHT, false);
+			}
+			else if (player.getLastMovement() == RIGHT) {
+				player.move(LEFT, false);
+			}
+		}
+	}
+
+	// if there is no collision
+	else {
+		if (keyStatus[GLFW_KEY_UP]) {
+			player.move(UP, true);
+		}
+		else if (keyStatus[GLFW_KEY_DOWN]) {
+			player.move(DOWN, true);
+		}
+		else if (keyStatus[GLFW_KEY_RIGHT]) {
+			player.move(RIGHT, true);
+		}
+		else if (keyStatus[GLFW_KEY_LEFT]) {
+			player.move(LEFT, true);
+		}
+
+		if (keyStatus[GLFW_KEY_SPACE]) {
+			missileList.push_back(Missile(player));
+			missileList.back().startup(myGraphics);
+		}
+	}
+
+	/**/
+
+	//Bot collision
+	for (int i = 0; i < tankList.size(); i++) {
+
+		if (checkCollision(tankList[i])) {
+			cout << tankList[i].getLastMovement() << endl;
+			if (tankList[i].getLastMovement() == DOWN) {
+				tankList[i].move(UP, false);
+			}
+			else if (tankList[i].getLastMovement() == UP) {
+				tankList[i].move(DOWN, false);
+			}
+			else if (tankList[i].getLastMovement() == LEFT) {
+				tankList[i].move(RIGHT, false);
+			}
+			else if (tankList[i].getLastMovement() == RIGHT) {
+				tankList[i].move(LEFT, false);
+			}
+		}
+
+		// if there is no collision
+		else {
+			if (tankList[i].getSame() < MAX_MOVE) {
+				tankList[i].move(tankList[i].getLastMovement(), true);
+				tankList[i].incSame();
+			} else {
+				tankList[i].resetSame();
+				int move = rand() % 5;
+				if (move == 0) {
+					tankList[i].move(UP, true);
+				}
+				else if (move == 1) {
+					tankList[i].move(DOWN, true);
+				}
+				else if (move == 2) {
+					tankList[i].move(RIGHT, true);
+				}
+				else if (move == 3) {
+					tankList[i].move(LEFT, true);
+				}
+			}
+		}
+	}
+
+}
+
+
+
+void updateSceneElements() {
 
 	glfwPollEvents();                                // poll callbacks
 
@@ -290,11 +395,17 @@ void updateSceneElements(float& x, float& y, float& z) {
 
 	//USER UpdateScene
 	player.sceneUpdate(myGraphics);
-	test.sceneUpdate(myGraphics);
 	for (int i = 0; i < wallList.size(); i++) {
 		wallList[i].sceneUpdate(myGraphics);
 	}
 
+	for (int i = 0; i < tankList.size(); i++) {
+		tankList[i].sceneUpdate(myGraphics);
+	}
+
+	for (int i = 0; i < missileList.size(); i++) {
+		missileList[i].sceneUpdate(myGraphics);
+	}
 
 	t += 0.01f; // increment movement variable
 
@@ -311,9 +422,16 @@ void renderScene() {
 
 	//USER
 	player.render();
-	test.render();
 	for (int i = 0; i < wallList.size(); i++) {
 		wallList[i].render();
+	}
+
+	for (int i = 0; i < tankList.size(); i++) {
+		tankList[i].render();
+	}
+
+	for (int i = 0; i < missileList.size(); i++) {
+		missileList[i].render();
 	}
 }
 

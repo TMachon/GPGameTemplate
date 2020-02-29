@@ -20,6 +20,7 @@ using namespace std;
 #define DOWN 2
 #define RIGHT 3
 #define LEFT 4
+#define MAX_MOVE 100
 
 
 class Tank {
@@ -27,7 +28,7 @@ class Tank {
 public:
 	Tank();
 	Tank(float, float, float);
-	void move(int movement);
+	void move(int movement, bool updateMovement);
 	void moveDebug(int movement);
 	void startup(Graphics& myGraphics, bool player);
 	void sceneUpdate(Graphics& myGraphics);
@@ -44,10 +45,15 @@ public:
 	Cube getHead();
 	Cube getCannon();
 	int getLastMovement();
+	int getSame();
+	int getId();
+	bool isPlayer();
 
 	//Setter
 	void setPosition(float x_in, float y_in, float z_in);
 	void setLastMovement(int movement);
+	void resetSame();
+	void incSame();
 
 
 private:
@@ -63,7 +69,9 @@ private:
 	float z_size;
 	glm::vec4 color;
 	int last_movement;
-
+	int same;
+	int id;
+	bool player;
 };
 
 #endif
