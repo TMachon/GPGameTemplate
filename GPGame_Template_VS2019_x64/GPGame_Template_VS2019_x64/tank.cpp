@@ -11,20 +11,6 @@
 #include "shapes.h"
 #include "graphics.h"
 
-float x, y, z;
-
-float x_size;
-float y_size;
-float z_size;
-
-Cube base;
-Cube head;
-Cube cannon;
-
-glm::vec4 color;
-
-char direction;
-
 // PUBLIC
 
 Tank::Tank() {
@@ -36,8 +22,6 @@ Tank::Tank() {
 	x_size = 1.0f;
 	y_size = 1.0f;
 	z_size = 1.0f;
-
-	direction = 'u';
 }
 
 Tank::Tank(float x_int, float y_int, float z_int) {
@@ -70,29 +54,30 @@ void Tank::startup(Graphics& myGraphics, bool player) {
 
 void Tank::move(int movement) {
 
+	last_movement = movement;
+
 	if (movement == UP) {
 		z += 0.01f;
-		direction = 'u';
+		
 	}
 
 	if (movement == DOWN) {
 		z -= 0.01f;
-		direction = 'd';
 	}
 
 	if (movement == RIGHT) {
 		x -= 0.01f;
-		direction = 'r';
 	}
 
 	if (movement == LEFT) {
 		x += 0.01f;
-		direction = 'l';
 	}
 
 }
 
 void Tank::moveDebug(int movement) {
+
+	last_movement = movement;
 
 	if (movement == UP) {
 		z += 0.02f;
@@ -183,26 +168,49 @@ glm::mat4 Tank::getHeadMatrix() {
 }
 
 glm::mat4 Tank::getCannonMatrix() {
-	glm::mat4 matrix;
-	if (direction == 'u') {
+	glm::mat4 matrix = glm::translate(glm::vec3(x, y_size + 0.25f, z + 0.5f))*
+		glm::mat4(1.0f)*
+		glm::scale(glm::vec3(0.2f, 0.2f, 0.5f));
+
+	if (last_movement == UP) {
 		matrix = glm::translate(glm::vec3(x, y_size + 0.25f, z + 0.5f)) *
 			glm::mat4(1.0f) *
 			glm::scale(glm::vec3(0.2f, 0.2f, 0.5f));
 	}
-	else if (direction == 'd') {
+	else if (last_movement == DOWN) {
 		matrix = glm::translate(glm::vec3(x, y_size + 0.25f, z - 0.5f)) *
 			glm::mat4(1.0f) *
 			glm::scale(glm::vec3(0.2f, 0.2f, 0.5f));
 	}
-	else if (direction == 'l') {
+	else if (last_movement == LEFT) {
 		matrix = glm::translate(glm::vec3(x + 0.5f, y_size + 0.25f, z)) *
 			glm::mat4(1.0f) *
 			glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
 	}
-	else if (direction == 'r') {
+	else if (last_movement == RIGHT) {
 		matrix = glm::translate(glm::vec3(x - 0.5f, y_size + 0.25f, z)) *
 			glm::mat4(1.0f) *
 			glm::scale(glm::vec3(0.5f, 0.2f, 0.2f));
 	}
 	return matrix;
+}
+
+Cube Tank::getBase() {
+	return base;
+}
+
+Cube Tank::getHead() {
+	return head;
+}
+
+Cube Tank::getCannon() {
+	return cannon;
+}
+
+int Tank::getLastMovement() {
+	return last_movement;
+}
+
+void Tank::setLastMovement(int movement) {
+	last_movement = movement;
 }

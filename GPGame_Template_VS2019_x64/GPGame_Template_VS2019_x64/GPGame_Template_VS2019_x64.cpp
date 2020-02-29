@@ -68,8 +68,8 @@ Cylinder    myCylinder;
 
 //USER
 Cube		secondCube;
-Tank		*player;
-Tank		*test;
+Tank		player;
+Tank		test;
 char		key;
 
 Tank	listOfWalls[NB_WALLS];
@@ -175,11 +175,11 @@ void startup() {
 
 	
 	//test = Tank();
-	test = new Tank(0.0f, 0.5f, 3.0f);
-	player = new Tank(1.0f, 0.5f, 1.0f);
+	test = Tank(0.0f, 0.5f, 3.0f);
+	player = Tank(1.0f, 0.5f, 1.0f);
 
-	player->startup(myGraphics, true);
-	test->startup(myGraphics, false);
+	player.startup(myGraphics, true);
+	test.startup(myGraphics, false);
 
 	/*for (int i = 0; i < NB_WALLS; i++) {
 		listOfWalls[1] = Tank();
@@ -195,12 +195,12 @@ void startup() {
 }
 
 bool checkCollision(Tank tank1, Tank tank2) {
-	return (tank1.x + tank1.x_size / 2 > tank2.x - tank2.x_size / 2 &&
-		tank1.x - tank1.x_size / 2 < tank2.x + tank2.x_size / 2 &&
-		tank1.y + tank1.y_size / 2 > tank2.y - tank2.y_size / 2 &&
-		tank1.y - tank1.y_size / 2 < tank2.y + tank2.y_size / 2 &&
-		tank1.z + tank1.z_size / 2 > tank2.z - tank2.z_size / 2 &&
-		tank1.z - tank1.z_size / 2 < tank2.z + tank2.z_size / 2);
+	return (tank1.getX() + tank1.getXSize() / 2 > tank2.getX() - tank2.getXSize() / 2 &&
+		tank1.getX() - tank1.getXSize() / 2 < tank2.getX() + tank2.getXSize() / 2 &&
+		tank1.getY() + tank1.getYSize() / 2 > tank2.getY() - tank2.getYSize() / 2 &&
+		tank1.getY() - tank1.getYSize() / 2 < tank2.getY() + tank2.getYSize() / 2 &&
+		tank1.getZ() + tank1.getZSize() / 2 > tank2.getZ() - tank2.getZSize() / 2 &&
+		tank1.getZ() - tank1.getZSize() / 2 < tank2.getZ() + tank2.getZSize() / 2);
 		
 }
 
@@ -239,45 +239,38 @@ void updateMovement(float& x, float& y, float& z) {
 	if (keyStatus[GLFW_KEY_D]) myGraphics.cameraPosition += glm::normalize(glm::cross(myGraphics.cameraFront, myGraphics.cameraUp)) * cameraSpeed;
 
 	// if there is a collision
-	if (checkCollision(*player, *test)) {
-		while (checkCollision(*player, *test)) {
-			if (key == 'u') {
-				player->move(DOWN);
+	if (checkCollision(player, test)) {
+		while (checkCollision(player, test)) {
+			if (player.getLastMovement()==DOWN) {
+				player.move(UP);
 			}
-			else if (key == 'd') {
-				player->move(UP);
+			else if (player.getLastMovement()==UP) {
+				player.move(DOWN);
 			}
-			else if (key == 'r') {
-				player->move(LEFT);
+			else if (player.getLastMovement()==LEFT) {
+				player.move(RIGHT);
 			}
-			else if (key == 'l') {
-				player->move(RIGHT);
+			else if (player.getLastMovement()==RIGHT) {
+				player.move(LEFT);
 			}
-
 		}
 	}
 
 	// if there is no collision
 	else {
 		if (keyStatus[GLFW_KEY_UP]) {
-			key = 'u';
-			player->move(UP);
+			player.move(UP);
 		}
 		else if (keyStatus[GLFW_KEY_DOWN]) {
-			key = 'd';
-			player->move(DOWN);
+			player.move(DOWN);
 		}
 		else if (keyStatus[GLFW_KEY_RIGHT]) {
-			key = 'r';
-			player->move(RIGHT);
+			player.move(RIGHT);
 		}
 		else if (keyStatus[GLFW_KEY_LEFT]) {
-			key = 'l';
-			player->move(LEFT);
+			player.move(LEFT);
 		}
 	}
-
-	cout << key << endl;
 
 	/**
 	stuckUp = false;
@@ -407,8 +400,8 @@ void updateSceneElements(float& x, float& y, float& z) {
 		glm::translate(glm::vec3(1.0f, 0.5f, 2.0f)) *
 		glm::mat4(1.0f);
 	myLine.proj_matrix = myGraphics.proj_matrix;
-	player->sceneUpdate(myGraphics);
-	test->sceneUpdate(myGraphics);
+	player.sceneUpdate(myGraphics);
+	test.sceneUpdate(myGraphics);
 
 	t += 0.01f; // increment movement variable
 
@@ -441,14 +434,14 @@ void renderScene() {
 	//myCylinder.Draw();
 
 	//USER
-	player->render();
-	test->render();
-	player->head.Draw();
-	player->base.Draw();
-	player->cannon.Draw();
-	test->head.Draw();
-	test->base.Draw();
-	test->cannon.Draw();
+	player.render();
+	test.render();
+	player.getHead().Draw();
+	player.getBase().Draw();
+	player.getCannon().Draw();
+	test.getHead().Draw();
+	test.getBase().Draw();
+	test.getCannon().Draw();
 	for (int i = 0; i < NB_WALLS; i++) {
 		//listOfWalls[i].render();
 	}

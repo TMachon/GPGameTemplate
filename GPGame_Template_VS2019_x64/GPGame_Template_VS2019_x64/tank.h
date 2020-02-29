@@ -25,15 +25,6 @@ using namespace std;
 class Tank {
 
 public:
-
-	Cube base;
-	Cube head;
-	Cube cannon;
-	float x, y, z;
-	float x_size;
-	float y_size;
-	float z_size;
-
 	Tank();
 	Tank(float, float, float);
 	void move(int movement);
@@ -41,19 +32,37 @@ public:
 	void startup(Graphics& myGraphics, bool player);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
+
+	//Getter
 	float getX();
 	float getY();
 	float getZ();
 	float getXSize();
 	float getYSize();
 	float getZSize();
+	Cube  getBase();
+	Cube getHead();
+	Cube getCannon();
+	int getLastMovement();
+
+	//Setter
 	void setPosition(float x_in, float y_in, float z_in);
+	void setLastMovement(int movement);
 
 
 private:
 	glm::mat4 getBaseMatrix();
 	glm::mat4 getHeadMatrix();
 	glm::mat4 getCannonMatrix();
+	Cube base;
+	Cube head;
+	Cube cannon;
+	float x, y, z;
+	float x_size;
+	float y_size;
+	float z_size;
+	glm::vec4 color;
+	int last_movement;
 
 };
 
