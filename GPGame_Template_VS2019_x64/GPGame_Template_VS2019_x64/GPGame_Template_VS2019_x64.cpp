@@ -64,7 +64,6 @@ Cube        myFloor;
 
 //USER
 Tank		player;
-Tank		test;
 
 std::vector<Wall> wallList;
 std::vector<Tank> tankList;
@@ -160,12 +159,11 @@ void startup() {
 	myGraphics.cameraPitch = defaultCameraPitch;
 	
 	//test = Tank();
-	test = Tank(0.0f, 0.5f, 3.0f);
 	player = Tank(1.0f, 0.5f, 1.0f);
-
 	player.startup(myGraphics, true);
-	test.startup(myGraphics, false);
-	tankList.push_back(test);
+
+	tankList.push_back(Tank(0.0f, 0.5f, 3.0f));
+	tankList.back().startup(myGraphics, false);
 
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
@@ -212,8 +210,6 @@ bool checkCollisionMissileWall(Missile m, Wall w) {
 bool checkCollisionMissileTank(Missile m, Tank t) {
 	return (m.getX() + m.getXSize() / 2 > t.getX() - t.getXSize() / 2 &&
 		m.getX() - m.getXSize() / 2 < t.getX() + t.getXSize() / 2 &&
-		m.getY() + m.getYSize() / 2 > t.getY() - t.getYSize() / 2 &&
-		m.getY() - m.getYSize() / 2 < t.getY() + t.getYSize() / 2 &&
 		m.getZ() + m.getZSize() / 2 > t.getZ() - t.getZSize() / 2 &&
 		m.getZ() - m.getZSize() / 2 < t.getZ() + t.getZSize() / 2);
 }
@@ -310,7 +306,6 @@ void updateCamera() {
 			myGraphics.cameraPosition + myGraphics.cameraFront,					// centre
 			myGraphics.cameraUp);												// up
 	}
-
 }
 
 void updateMovement() {
