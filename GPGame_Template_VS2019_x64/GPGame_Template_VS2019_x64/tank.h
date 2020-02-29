@@ -27,7 +27,7 @@ class Tank {
 
 public:
 	Tank();
-	Tank(float, float, float);
+	Tank(int, float, float, float);
 	void move(int movement, bool updateMovement);
 	void moveDebug(int movement);
 	void startup(Graphics& myGraphics, bool player);

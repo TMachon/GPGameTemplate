@@ -15,6 +15,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <ctime>
 using namespace std;
 
 // Helper graphic libraries
@@ -63,6 +64,8 @@ Graphics    myGraphics;
 Cube        myFloor;
 
 //USER
+int getNewId();
+
 Tank		player;
 
 std::vector<Wall> wallList;
@@ -72,6 +75,8 @@ glm::vec3	defaultCameraPostion;
 GLfloat		defaultCameraPitch;
 
 std::vector<Missile> missileList;
+
+int id;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -85,6 +90,8 @@ int main()
 	float zpos = 0.0f;
 	int errorGraphics = myGraphics.Init();			// Launch window and graphics context
 	if (errorGraphics) return 0;					// Close if something went wrong...
+
+	id = std::time(nullptr);
 
 	startup();										// Setup all necessary information for startup (aka. load texture, shaders, models, etc).
 
@@ -159,11 +166,16 @@ void startup() {
 	myGraphics.cameraPitch = defaultCameraPitch;
 	
 	//test = Tank();
-	player = Tank(1.0f, 0.5f, 1.0f);
+
+
+	player = Tank(getNewId(), 1.0f, 0.5f, 1.0f);
 	player.startup(myGraphics, true);
 
-	tankList.push_back(Tank(0.0f, 0.5f, 3.0f));
+	tankList.push_back(Tank(getNewId(), 0.0f, 0.5f, 3.0f));
 	tankList.back().startup(myGraphics, false);
+
+	cout << player.getId() << endl;
+	cout << tankList.back().getId() << endl;
 
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
@@ -223,18 +235,18 @@ void checkMissileCollision() {
 				toRemove.push_back(i);
 			}
 		}
-	}
-	for (int i = 0; i < missileList.size(); i++) {
 		for (int j = 0; j < tankList.size(); j++) {
 			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
 				toRemove.push_back(i);
-				tankList.erase(tankList.begin() + i);
+				tankList.erase(tankList.begin() + j);
 			}
 		}
 	}
+	/**/
 	for (int i = 0; i < toRemove.size(); i++) {
 		missileList.erase(missileList.begin() + i);
 	}
+	/**/
 }
 
 bool checkCollision(Tank tank) {
@@ -345,10 +357,11 @@ void updateMovement() {
 			player.move(LEFT, true);
 		}
 
-		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 100.0f) {
+		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 500.0f) {
 			myDeltaTime = 0.0f;
-			missileList.push_back(Missile(player));
+			missileList.push_back(Missile(getNewId(), player));
 			missileList.back().startup(myGraphics);
+			cout << missileList.back().getId() << endl;
 		}
 	}
 
@@ -509,4 +522,9 @@ void onMouseMoveCallback(GLFWwindow* window, double x, double y) {
 
 void onMouseWheelCallback(GLFWwindow* window, double xoffset, double yoffset) {
 	int yoffsetInt = static_cast<int>(yoffset);
+}
+
+int getNewId() {
+	id++;
+	return id;
 }

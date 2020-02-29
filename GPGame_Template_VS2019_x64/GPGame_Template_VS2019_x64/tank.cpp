@@ -17,20 +17,9 @@
 
 Tank::Tank() {
 
-	x = 1.0f;
-	y = 0.5f;
-	z = 1.0f;
-	
-	x_size = 1.0f;
-	y_size = 1.0f;
-	z_size = 1.0f;
-
-	same = 0;
-
-	id = std::time(nullptr);
 }
 
-Tank::Tank(float x_int, float y_int, float z_int) {
+Tank::Tank(int id_in, float x_int, float y_int, float z_int) {
 	x = x_int;
 	y = y_int;
 	z = z_int;
@@ -41,7 +30,7 @@ Tank::Tank(float x_int, float y_int, float z_int) {
 
 	same = 0;
 
-	id = std::time(nullptr);
+	id = id_in;
 }
 
 void Tank::startup(Graphics& myGraphics, bool player_in) {

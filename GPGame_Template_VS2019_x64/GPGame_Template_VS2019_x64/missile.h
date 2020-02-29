@@ -26,7 +26,7 @@ class Missile {
 
 public:
 
-	Missile(Tank tank);
+	Missile(int id, Tank tank);
 	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
@@ -36,6 +36,7 @@ public:
 	float getXSize();
 	float getYSize();
 	float getZSize();
+	int getId();
 
 private:
 
@@ -46,6 +47,7 @@ private:
 	float y_size;
 	float z_size;
 	float velocity;
+	int id;
 };
 
 #endif

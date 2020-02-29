@@ -1,6 +1,7 @@
 #include "missile.h"
 #include <iostream>
 #include <sstream>
+#include <ctime>
 
 #include <GL/glew.h>
 
@@ -11,13 +12,15 @@
 #include "shapes.h"
 #include "graphics.h"
 
-Missile::Missile(Tank tank) {
+Missile::Missile(int id_in, Tank tank) {
 
 	direction = tank.getLastMovement();
 	y = 1.25f;
-	velocity = 0.75f;
+	velocity = 0.05f;
 
 	x_size = y_size = z_size = 0.2f;
+
+	id = id_in;
 
 	if (direction == UP) {
 		x = tank.getX();
@@ -88,4 +91,8 @@ float Missile::getYSize() {
 
 float Missile::getZSize() {
 	return z_size;
+}
+
+int Missile::getId() {
+	return id;
 }
