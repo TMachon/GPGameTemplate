@@ -227,26 +227,19 @@ bool checkCollisionMissileTank(Missile m, Tank t) {
 }
 
 void checkMissileCollision() {
-	/**/
-	vector<int> toRemove = vector<int>();
 	for (int i = 0; i < missileList.size(); i++) {
 		for (int j = 0; j < wallList.size(); j++) {
 			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
-				toRemove.push_back(i);
+				missileList.erase(missileList.begin() + i);
 			}
 		}
 		for (int j = 0; j < tankList.size(); j++) {
 			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
-				toRemove.push_back(i);
+				missileList.erase(missileList.begin() + i);
 				tankList.erase(tankList.begin() + j);
 			}
 		}
 	}
-	/**/
-	for (int i = 0; i < toRemove.size(); i++) {
-		missileList.erase(missileList.begin() + i);
-	}
-	/**/
 }
 
 bool checkCollision(Tank tank) {
@@ -409,7 +402,6 @@ void updateMovement() {
 			}
 		}
 	}
-
 }
 
 
