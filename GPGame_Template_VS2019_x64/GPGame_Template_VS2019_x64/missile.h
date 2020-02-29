@@ -30,14 +30,22 @@ public:
 	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
+	float getX();
+	float getY();
+	float getZ();
+	float getXSize();
+	float getYSize();
+	float getZSize();
 
 private:
 
 	Cube body;
 	int direction;
 	float x, y, z;
+	float x_size;
+	float y_size;
+	float z_size;
 	float velocity;
-
 };
 
 #endif

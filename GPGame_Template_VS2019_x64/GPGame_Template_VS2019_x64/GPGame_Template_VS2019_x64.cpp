@@ -200,6 +200,47 @@ bool checkCollisionWall(Tank tank, Wall wall) {
 		tank.getZ() - tank.getZSize() / 2 < wall.getZ() + wall.getZSize() / 2);
 }
 
+bool checkCollisionMissileWall(Missile m, Wall w) {
+	return (m.getX() + m.getXSize() / 2 > w.getX() - w.getXSize() / 2 &&
+		m.getX() - m.getXSize() / 2 < w.getX() + w.getXSize() / 2 &&
+		m.getY() + m.getYSize() / 2 > w.getY() - w.getYSize() / 2 &&
+		m.getY() - m.getYSize() / 2 < w.getY() + w.getYSize() / 2 &&
+		m.getZ() + m.getZSize() / 2 > w.getZ() - w.getZSize() / 2 &&
+		m.getZ() - m.getZSize() / 2 < w.getZ() + w.getZSize() / 2);
+}
+
+bool checkCollisionMissileTank(Missile m, Tank t) {
+	return (m.getX() + m.getXSize() / 2 > t.getX() - t.getXSize() / 2 &&
+		m.getX() - m.getXSize() / 2 < t.getX() + t.getXSize() / 2 &&
+		m.getY() + m.getYSize() / 2 > t.getY() - t.getYSize() / 2 &&
+		m.getY() - m.getYSize() / 2 < t.getY() + t.getYSize() / 2 &&
+		m.getZ() + m.getZSize() / 2 > t.getZ() - t.getZSize() / 2 &&
+		m.getZ() - m.getZSize() / 2 < t.getZ() + t.getZSize() / 2);
+}
+
+void checkMissileCollision() {
+	/**/
+	vector<int> toRemove = vector<int>();
+	for (int i = 0; i < missileList.size(); i++) {
+		for (int j = 0; j < wallList.size(); j++) {
+			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
+				toRemove.push_back(i);
+			}
+		}
+	}
+	for (int i = 0; i < missileList.size(); i++) {
+		for (int j = 0; j < tankList.size(); j++) {
+			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
+				toRemove.push_back(i);
+				tankList.erase(tankList.begin() + i);
+			}
+		}
+	}
+	for (int i = 0; i < toRemove.size(); i++) {
+		missileList.erase(missileList.begin() + i);
+	}
+}
+
 bool checkCollision(Tank tank) {
 	/**/
 	for (int i = 0; i < wallList.size(); i++) {
@@ -309,7 +350,8 @@ void updateMovement() {
 			player.move(LEFT, true);
 		}
 
-		if (keyStatus[GLFW_KEY_SPACE]) {
+		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 100.0f) {
+			myDeltaTime = 0.0f;
 			missileList.push_back(Missile(player));
 			missileList.back().startup(myGraphics);
 		}
@@ -375,16 +417,6 @@ void updateSceneElements() {
 	myDeltaTime += currentTime;
 
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-	
-	if (myDeltaTime > 500) {
-		if (rand() % 99 > 50) {
-			xrand += (float)rand() / (float)(RAND_MAX / 0.1f);
-		}
-		else {
-			xrand -= (float)rand() / (float)(RAND_MAX / 0.1f);
-		}
-		myDeltaTime = 0.0f;
-	}
 
 	// Calculate floor position and resize
 	myFloor.mv_matrix = myGraphics.viewMatrix *
@@ -394,6 +426,8 @@ void updateSceneElements() {
 	myFloor.proj_matrix = myGraphics.proj_matrix;
 
 	//USER UpdateScene
+	checkMissileCollision();
+
 	player.sceneUpdate(myGraphics);
 	for (int i = 0; i < wallList.size(); i++) {
 		wallList[i].sceneUpdate(myGraphics);
