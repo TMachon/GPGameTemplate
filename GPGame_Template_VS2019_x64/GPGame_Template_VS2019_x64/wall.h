@@ -12,7 +12,7 @@ using namespace std;
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
-
+#include "shapes.h"
 #include "graphics.h"
 
 
@@ -34,6 +34,17 @@ public:
 	glm::vec4 getTopRight();
 	glm::vec4 getBottomLeft();
 	glm::vec4 getBottomRight();
+
+private:
+	float x_wall;
+	float y_wall;
+	float z_wall;
+	float x_size_wall;
+	float y_size_wall;
+	float z_size_wall;
+	bool soft; //true if wall is destructible
+	Cube cube;
+	glm::vec4 color_wall;
 };
 
 #endif

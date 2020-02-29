@@ -29,6 +29,7 @@ using namespace std;
 #include "graphics.h"
 #include "shapes.h"
 #include "tank.h"
+#include "wall.h"
 
 #define NB_WALLS 2
 
@@ -70,9 +71,8 @@ Cylinder    myCylinder;
 Cube		secondCube;
 Tank		player;
 Tank		test;
-char		key;
 
-Tank	listOfWalls[NB_WALLS];
+std::vector<Wall> wallList;
 
 bool		stuckUp;
 bool		stuckDown;
@@ -184,14 +184,18 @@ void startup() {
 	/*for (int i = 0; i < NB_WALLS; i++) {
 		listOfWalls[1] = Tank();
 	}*/
-	//listOfWalls[0].startup(myGraphics, 0.0f, 0.5f, 10.0f, 10.0f, 1.0f, 1.0f, false);
-	//listOfWalls[1].startup(myGraphics, -2.0f, 0.5f, 2.0f, 1.0f, 1.0f, 1.0f, false);
-
-	stuckUp = true;
-	stuckDown = true;
-	stuckRight = true;
-	stuckLeft = true;
-	key = ' ';
+	Wall wall1 = Wall();
+	Wall wall2 = Wall();
+	Wall wall3 = Wall();
+	Wall wall4 = Wall();
+	wall1.startup(myGraphics, 0.0f, 0.5f, 10.0f, 30.0f, 2.0f, 1.0f, false);
+	wall2.startup(myGraphics, -15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
+	wall3.startup(myGraphics, 0.0f, 0.5f, -20.0f, 30.0f, 2.0f, 1.0f, false);
+	wall4.startup(myGraphics, 15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
+	wallList.push_back(wall1);
+	wallList.push_back(wall2);
+	wallList.push_back(wall3);
+	wallList.push_back(wall4);
 }
 
 bool checkCollision(Tank tank1, Tank tank2) {
@@ -272,25 +276,6 @@ void updateMovement(float& x, float& y, float& z) {
 		}
 	}
 
-	/**
-	stuckUp = false;
-	stuckDown = false;
-	stuckRight = false;
-	stuckLeft = false;
-	std::list<Tank*>::iterator itW;
-	/**
-	for (int i = 0; i < NB_WALLS; i++) {
-
-	}
-	/**
-	while (stuckUp) {
-		player->moveDebug(DOWN);
-		stuckUp = checkCollision(*player, *test);
-	}
-	/**/
-
-	
-
 	// IMPORTANT PART
 	// Calculate my view matrix using the lookAt helper function
 	if (mouseEnabled) {
@@ -321,66 +306,6 @@ void updateSceneElements(float& x, float& y, float& z) {
 		}
 		myDeltaTime = 0.0f;
 	}
-	// Calculate Cube position
-	glm::mat4 mv_matrix_cube =
-		glm::translate(glm::vec3(2.0f+xrand, 0.5f, 0.0f+xrand)) *
-		glm::mat4(1.0f);
-	myCube.mv_matrix = myGraphics.viewMatrix * mv_matrix_cube;
-	myCube.proj_matrix = myGraphics.proj_matrix;
-
-	// Calculate SecondeCube Position
-	//alea -= (float)rand() / (float)(RAND_MAX / 1);
-	int randi = rand() % 100;
-
-	/*glm::mat4 basepos = 
-		myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
-		glm::mat4(1.0f) *
-		glm::scale(glm::vec3(player->x_size, player->y_size, player->z_size));
-	player->base.mv_matrix = myGraphics.viewMatrix * basepos;
-	player->base.proj_matrix = myGraphics.proj_matrix;*/
-
-
-	
-	glm::mat4 mv_matrix_cube2 =
-		glm::translate(glm::vec3(x, y, z)) *
-		glm::mat4(10.0f) * 
-		glm::scale(glm::vec3(1.0f, 1.0f, 1.0f));
-	secondCube.mv_matrix = myGraphics.viewMatrix * mv_matrix_cube2;
-	secondCube.proj_matrix = myGraphics.proj_matrix;
-
-	// calculate Sphere movement
-	glm::mat4 mv_matrix_sphere =
-		glm::translate(glm::vec3(-2.0f, 0.5f, 0.0f)) *
-		glm::rotate(-t, glm::vec3(0.0f, 1.0f, 0.0f)) *
-		glm::rotate(-t, glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::mat4(1.0f);
-	mySphere.mv_matrix = myGraphics.viewMatrix * mv_matrix_sphere;
-	mySphere.proj_matrix = myGraphics.proj_matrix;
-
-	//Calculate Arrows translations (note: arrow model points up)
-	glm::mat4 mv_matrix_x =
-		glm::translate(glm::vec3(0.0f, 0.0f, 0.0f)) *
-		glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f)) *
-		glm::scale(glm::vec3(0.2f, 0.5f, 0.2f)) *
-		glm::mat4(1.0f);
-	arrowX.mv_matrix = myGraphics.viewMatrix * mv_matrix_x;
-	arrowX.proj_matrix = myGraphics.proj_matrix;
-
-	glm::mat4 mv_matrix_y =
-		glm::translate(glm::vec3(0.0f, 0.0f, 0.0f)) *
-		//glm::rotate(glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f)) *    // already model pointing up
-		glm::scale(glm::vec3(0.2f, 0.5f, 0.2f)) *
-		glm::mat4(1.0f);
-	arrowY.mv_matrix = myGraphics.viewMatrix * mv_matrix_y;
-	arrowY.proj_matrix = myGraphics.proj_matrix;
-
-	glm::mat4 mv_matrix_z =
-		glm::translate(glm::vec3(0.0f, 0.0f, 0.0f)) *
-		glm::rotate(glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) *
-		glm::scale(glm::vec3(0.2f, 0.5f, 0.2f)) *
-		glm::mat4(1.0f);
-	arrowZ.mv_matrix = myGraphics.viewMatrix * mv_matrix_z;
-	arrowZ.proj_matrix = myGraphics.proj_matrix;
 
 	// Calculate floor position and resize
 	myFloor.mv_matrix = myGraphics.viewMatrix *
@@ -389,19 +314,19 @@ void updateSceneElements(float& x, float& y, float& z) {
 		glm::mat4(1.0f);
 	myFloor.proj_matrix = myGraphics.proj_matrix;
 
-	// Calculate cylinder
-	myCylinder.mv_matrix = myGraphics.viewMatrix *
-		glm::translate(glm::vec3(-1.0f, 0.5f, 2.0f)) *
-		glm::mat4(1.0f);
-	myCylinder.proj_matrix = myGraphics.proj_matrix;
-
 	// Calculate Line
 	myLine.mv_matrix = myGraphics.viewMatrix *
 		glm::translate(glm::vec3(1.0f, 0.5f, 2.0f)) *
 		glm::mat4(1.0f);
 	myLine.proj_matrix = myGraphics.proj_matrix;
+
+	//USER UpdateScene
 	player.sceneUpdate(myGraphics);
 	test.sceneUpdate(myGraphics);
+	for (int i = 0; i < wallList.size(); i++) {
+		wallList[i].sceneUpdate(myGraphics);
+	}
+
 
 	t += 0.01f; // increment movement variable
 
@@ -422,28 +347,12 @@ void renderScene() {
 
 	// Draw objects in screen
 	myFloor.Draw();
-	//myCube.Draw();
-	secondCube.Draw();
-	mySphere.Draw();
-
-	//arrowX.Draw();
-	//arrowY.Draw();
-	//arrowZ.Draw();
-
-	//myLine.Draw();
-	//myCylinder.Draw();
 
 	//USER
 	player.render();
 	test.render();
-	player.getHead().Draw();
-	player.getBase().Draw();
-	player.getCannon().Draw();
-	test.getHead().Draw();
-	test.getBase().Draw();
-	test.getCannon().Draw();
-	for (int i = 0; i < NB_WALLS; i++) {
-		//listOfWalls[i].render();
+	for (int i = 0; i < wallList.size(); i++) {
+		wallList[i].render();
 	}
 }
 

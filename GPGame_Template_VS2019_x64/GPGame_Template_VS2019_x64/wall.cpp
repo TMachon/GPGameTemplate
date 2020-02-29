@@ -11,18 +11,6 @@
 #include "shapes.h"
 #include "graphics.h"
 
-float x_wall;
-float y_wall;
-float z_wall;
-float x_size_wall;
-float y_size_wall;
-float z_size_wall;
-bool soft; //true if wall is destructible
-
-Cube cube;
-
-glm::vec4 color_wall;
-
 // PUBLIC
 Wall::Wall() {
 
