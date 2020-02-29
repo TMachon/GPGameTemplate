@@ -58,26 +58,16 @@ bool		mouseEnabled = true; // keep track of mouse toggle.
 Graphics    myGraphics;
 
 // DEMO OBJECTS
-Cube        myCube;
-Sphere      mySphere;
-Arrow       arrowX;
-Arrow       arrowY;
-Arrow       arrowZ;
 Cube        myFloor;
-Line        myLine;
-Cylinder    myCylinder;
 
 //USER
-Cube		secondCube;
 Tank		player;
 Tank		test;
 
 std::vector<Wall> wallList;
 
-bool		stuckUp;
-bool		stuckDown;
-bool		stuckRight;
-bool		stuckLeft;
+glm::vec3	defaultCameraPostion;
+GLfloat		defaultCameraPitch;
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -142,37 +132,21 @@ void startup() {
 	myGraphics.proj_matrix = glm::perspective(glm::radians(50.0f), myGraphics.aspect, 0.1f, 1000.0f);
 
 	// Load Geometry examples
-	myCube.Load();
-
-	mySphere.Load();
-	mySphere.fillColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);    // You can change the shape fill colour, line colour or linewidth
-
-	arrowX.Load(); arrowY.Load(); arrowZ.Load();
-	arrowX.fillColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f); arrowX.lineColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	arrowY.fillColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f); arrowY.lineColor = glm::vec4(0.0f, 1.0f, 0.0f, 1.0f);
-	arrowZ.fillColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f); arrowZ.lineColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
 
 	myFloor.Load();
 	myFloor.fillColor = glm::vec4(130.0f / 255.0f, 96.0f / 255.0f, 61.0f / 255.0f, 1.0f);    // Sand Colour
 	myFloor.lineColor = glm::vec4(130.0f / 255.0f, 96.0f / 255.0f, 61.0f / 255.0f, 1.0f);    // Sand again
-
-	myCylinder.Load();
-	myCylinder.fillColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
-	myCylinder.lineColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
-
-	myLine.Load();
-	myLine.fillColor = glm::vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	myLine.lineColor = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
-	myLine.lineWidth = 5.0f;
 
 	// Optimised Graphics
 	myGraphics.SetOptimisations();        // Cull and depth testing
 
 	//USER
 
-	secondCube.Load();
-	secondCube.fillColor = glm::vec4(0.0f, 0.0f, 255.0f, 1.0f);
-
+	//camera
+	defaultCameraPostion = glm::vec3(0.0f, 27.0f, -21.0f);
+	defaultCameraPitch = -63.5f;
+	myGraphics.cameraPosition = defaultCameraPostion;
+	myGraphics.cameraPitch = defaultCameraPitch;
 	
 	//test = Tank();
 	test = Tank(0.0f, 0.5f, 3.0f);
@@ -181,9 +155,6 @@ void startup() {
 	player.startup(myGraphics, true);
 	test.startup(myGraphics, false);
 
-	/*for (int i = 0; i < NB_WALLS; i++) {
-		listOfWalls[1] = Tank();
-	}*/
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
 	Wall wall3 = Wall();
@@ -215,6 +186,9 @@ void updateMovement(float& x, float& y, float& z) {
 	GLfloat yoffset = myGraphics.cameraLastY - myGraphics.mouseY;    // Reversed mouse movement
 	myGraphics.cameraLastX = (GLfloat)myGraphics.mouseX;
 	myGraphics.cameraLastY = (GLfloat)myGraphics.mouseY;
+
+	//myGraphics.cameraLastX = (GLfloat)myGraphics.mouseX;
+	//myGraphics.cameraLastY = (GLfloat)myGraphics.mouseY;
 
 	GLfloat sensitivity = 0.05f;
 	xoffset *= sensitivity;
@@ -314,12 +288,6 @@ void updateSceneElements(float& x, float& y, float& z) {
 		glm::mat4(1.0f);
 	myFloor.proj_matrix = myGraphics.proj_matrix;
 
-	// Calculate Line
-	myLine.mv_matrix = myGraphics.viewMatrix *
-		glm::translate(glm::vec3(1.0f, 0.5f, 2.0f)) *
-		glm::mat4(1.0f);
-	myLine.proj_matrix = myGraphics.proj_matrix;
-
 	//USER UpdateScene
 	player.sceneUpdate(myGraphics);
 	test.sceneUpdate(myGraphics);
@@ -329,13 +297,6 @@ void updateSceneElements(float& x, float& y, float& z) {
 
 
 	t += 0.01f; // increment movement variable
-
-	//USER
-
-	//
-	/*for (int i = 0; i < NB_WALLS; i++) {
-		listOfWalls[i].sceneUpdate(myGraphics);
-	}*/
 
 	if (glfwWindowShouldClose(myGraphics.window) == GL_TRUE) quit = true; // If quit by pressing x on window.
 
