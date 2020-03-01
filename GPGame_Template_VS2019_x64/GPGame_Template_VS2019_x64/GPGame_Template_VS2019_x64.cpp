@@ -32,6 +32,8 @@ using namespace std;
 #include "tank.h"
 #include "wall.h"
 #include "missile.h"
+#include "particule.h"
+#include "missileExplosion.h"
 
 #define NB_WALLS 2
 
@@ -53,6 +55,7 @@ void onMouseWheelCallback(GLFWwindow* window, double xoffset, double yoffset);
 bool        quit = false;
 float       deltaTime = 0.0f;    // Keep track of time per frame.
 float		myDeltaTime = 0.0f;
+float		deltaTimeExplosion = 0.0f;
 float       lastTime = 0.0f;    // variable to keep overall time.
 bool        keyStatus[1024];    // Hold key status.
 bool		mouseEnabled = true; // keep track of mouse toggle.
@@ -75,6 +78,7 @@ glm::vec3	defaultCameraPostion;
 GLfloat		defaultCameraPitch;
 
 std::vector<Missile> missileList;
+std::vector<MissileExplosion> explosionList;
 
 int id;
 
@@ -113,8 +117,6 @@ int main()
 		// Render a still frame into an off-screen frame buffer known as the backbuffer.
 		renderScene();
 
-		
-
 		// Swap the back buffer with sthe front buffer, making the most recently rendered image visible on-screen.
 		glfwSwapBuffers(myGraphics.window);        // swap buffers (avoid flickering and tearing)
 
@@ -134,7 +136,8 @@ void startup() {
 	// Keep track of the running time
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime;                        // start delta time
-	lastTime = currentTime;                            // Save for next frame calculations.
+	lastTime = currentTime;
+	// Save for next frame calculations.
 
 	// Callback graphics and key update functions - declared in main to avoid scoping complexity.
 	// More information here : https://www.glfw.org/docs/latest/input_guide.html
@@ -173,9 +176,6 @@ void startup() {
 
 	tankList.push_back(Tank(getNewId(), 0.0f, 0.5f, 3.0f));
 	tankList.back().startup(myGraphics, false);
-
-	cout << player.getId() << endl;
-	cout << tankList.back().getId() << endl;
 
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
@@ -233,13 +233,14 @@ void checkMissileCollision() {
 		for (int j = 0; j < wallList.size(); j++) {
 			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
 				toRemove.push_back(missileList[i].getId());
-				cout << i << endl;
+				explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
 				
 			}
 		}
 		for (int j = 0; j < tankList.size(); j++) {
 			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
 				toRemove.push_back(missileList[i].getId());
+				explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
 				tankList.erase(tankList.begin() + j);
 			}
 		}
@@ -363,11 +364,10 @@ void updateMovement() {
 			player.move(LEFT, true);
 		}
 
-		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 500.0f) {
+		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 1000.0f) {
 			myDeltaTime = 0.0f;
 			missileList.push_back(Missile(getNewId(), player));
 			missileList.back().startup(myGraphics);
-			cout << missileList.back().getId() << endl;
 		}
 	}
 
@@ -377,7 +377,6 @@ void updateMovement() {
 	for (int i = 0; i < tankList.size(); i++) {
 
 		if (checkCollision(tankList[i])) {
-			cout << tankList[i].getLastMovement() << endl;
 			if (tankList[i].getLastMovement() == DOWN) {
 				tankList[i].move(UP, false);
 			}
@@ -428,6 +427,7 @@ void updateSceneElements() {
 	deltaTime = currentTime - lastTime;                // Calculate delta time
 	lastTime = currentTime;                            // Save for next frame calculations.
 	myDeltaTime += currentTime;
+	deltaTimeExplosion += currentTime;
 
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 
@@ -452,6 +452,13 @@ void updateSceneElements() {
 
 	for (int i = 0; i < missileList.size(); i++) {
 		missileList[i].sceneUpdate(myGraphics);
+	}
+	cout << explosionList.size() << endl;
+	for (int i = 0; i < explosionList.size(); i++) {
+		explosionList[i].sceneUpdate(myGraphics);
+		if (explosionList[i].getParticleList().empty()) {
+			explosionList.erase(explosionList.begin() + i);
+		}
 	}
 
 	t += 0.01f; // increment movement variable
@@ -479,6 +486,10 @@ void renderScene() {
 
 	for (int i = 0; i < missileList.size(); i++) {
 		missileList[i].render();
+	}
+
+	for (int i = 0; i < explosionList.size(); i++) {
+		explosionList[i].render();
 	}
 }
 

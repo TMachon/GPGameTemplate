@@ -16,7 +16,7 @@ Missile::Missile(int id_in, Tank tank) {
 
 	direction = tank.getLastMovement();
 	y = 1.25f;
-	velocity = 0.05f;
+	velocity = 0.07f;
 
 	x_size = y_size = z_size = 0.2f;
 
