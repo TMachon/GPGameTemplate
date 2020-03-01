@@ -36,6 +36,7 @@ using namespace std;
 #include "missileExplosion.h"
 
 #define NB_WALLS 2
+#define MAX_TANK 3
 
 // MAIN FUNCTIONS
 void startup();
@@ -43,6 +44,8 @@ void updateCamera();
 void updateMovement();
 void updateSceneElements();
 void renderScene();
+void spawnTank();
+
 
 // CALLBACK FUNCTIONS
 void onResizeCallback(GLFWwindow* window, int w, int h);
@@ -55,6 +58,7 @@ void onMouseWheelCallback(GLFWwindow* window, double xoffset, double yoffset);
 bool        quit = false;
 float       deltaTime = 0.0f;    // Keep track of time per frame.
 float		myDeltaTime = 0.0f;
+float		deltaTankSpawn = 0.0f;
 float		deltaTimeExplosion = 0.0f;
 float       lastTime = 0.0f;    // variable to keep overall time.
 bool        keyStatus[1024];    // Hold key status.
@@ -86,6 +90,7 @@ int id;
 float t = 0.001f;            // Global variable for animation
 float alea = 0.0f;
 float xrand = 0.0;
+int max_tank = 5;
 
 int main()
 {
@@ -108,6 +113,8 @@ int main()
 		
 
 		updateCamera();
+
+		spawnTank();
 
 		updateMovement();
 
@@ -171,11 +178,9 @@ void startup() {
 	//test = Tank();
 
 
-	player = Tank(getNewId(), 1.0f, 0.5f, 1.0f);
+	player = Tank(getNewId(), 0.0f, 0.5f, -15.0f);
 	player.startup(myGraphics, true);
-
-	tankList.push_back(Tank(getNewId(), 0.0f, 0.5f, 3.0f));
-	tankList.back().startup(myGraphics, false);
+	player.move(UP, true);
 
 	Wall wall1 = Wall();
 	Wall wall2 = Wall();
@@ -242,6 +247,7 @@ void checkMissileCollision() {
 				toRemove.push_back(missileList[i].getId());
 				explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
 				tankList.erase(tankList.begin() + j);
+				deltaTankSpawn = 0.0f;
 			}
 		}
 	}
@@ -327,6 +333,16 @@ void updateCamera() {
 	}
 }
 
+void spawnTank() {
+	if (tankList.size() < max_tank && deltaTankSpawn > 2000.0f) {
+		float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 13.0f;
+		float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 18.0f;
+		tankList.push_back(Tank(getNewId(), rand_x, 0.5f, rand_z));
+		tankList.back().startup(myGraphics, false);
+		deltaTankSpawn = 0.0f;
+	}
+}
+
 void updateMovement() {
 	
 
@@ -364,7 +380,7 @@ void updateMovement() {
 			player.move(LEFT, true);
 		}
 
-		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 1000.0f) {
+		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 2000.0f) {
 			myDeltaTime = 0.0f;
 			missileList.push_back(Missile(getNewId(), player));
 			missileList.back().startup(myGraphics);
@@ -428,6 +444,7 @@ void updateSceneElements() {
 	lastTime = currentTime;                            // Save for next frame calculations.
 	myDeltaTime += currentTime;
 	deltaTimeExplosion += currentTime;
+	deltaTankSpawn += currentTime;
 
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 

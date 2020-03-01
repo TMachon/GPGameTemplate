@@ -22,9 +22,9 @@ using namespace std;
 #define RIGHT 3
 #define LEFT 4
 
-#define X_SIZE 0.4f
-#define Y_SIZE 0.4f
-#define Z_SIZE 0.4f
+#define X_SIZE 0.5f
+#define Y_SIZE 0.5f
+#define Z_SIZE 0.5f
 
 class Particule {
 

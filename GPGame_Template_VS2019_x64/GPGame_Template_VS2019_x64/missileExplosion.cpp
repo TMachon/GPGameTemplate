@@ -14,7 +14,7 @@
 #include "graphics.h"
 
 MissileExplosion::MissileExplosion(float x, float y, float z, Graphics& myGraphics) {
-	int nb = rand() % 100;
+	int nb = 10+(rand() % 10);
 	for (int i = 0; i < nb; i++) {
 		particuleList.push_back(Particule(x, y, z));
 		particuleList.back().startup(myGraphics);

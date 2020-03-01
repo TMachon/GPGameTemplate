@@ -16,8 +16,8 @@ Particule::Particule(float x_in, float y_in, float z_in) {
 	x = x_in;
 	y = y_in;
 	z = z_in;
-	velocity = 0.2f;
-	lifetime = rand() % 30;
+	velocity = 0.15f;
+	lifetime = rand() % 50;
 }
 
 void Particule::startup(Graphics& myGraphics) {
