@@ -91,6 +91,7 @@ float t = 0.001f;            // Global variable for animation
 float alea = 0.0f;
 float xrand = 0.0;
 int max_tank = 5;
+int cooldown = 0;
 
 int main()
 {
@@ -144,6 +145,7 @@ void startup() {
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime;                        // start delta time
 	lastTime = currentTime;
+	myDeltaTime = currentTime;
 	// Save for next frame calculations.
 
 	// Callback graphics and key update functions - declared in main to avoid scoping complexity.
@@ -379,9 +381,11 @@ void updateMovement() {
 		else if (keyStatus[GLFW_KEY_LEFT]) {
 			player.move(LEFT, true);
 		}
-
-		if (keyStatus[GLFW_KEY_SPACE] && myDeltaTime > 2000.0f) {
-			myDeltaTime = 0.0f;
+		//gcout << myDeltaTime << endl;
+		cooldown++;
+		if (keyStatus[GLFW_KEY_SPACE] && cooldown > 100) {
+			//myDeltaTime = 0.0f;
+			cooldown = 0;
 			missileList.push_back(Missile(getNewId(), player));
 			missileList.back().startup(myGraphics);
 		}
@@ -414,7 +418,7 @@ void updateMovement() {
 				tankList[i].incSame();
 			} else {
 				tankList[i].resetSame();
-				int move = rand() % 5;
+				int move = rand() % 6;
 				if (move == 0) {
 					tankList[i].move(UP, true);
 				}
@@ -426,6 +430,10 @@ void updateMovement() {
 				}
 				else if (move == 3) {
 					tankList[i].move(LEFT, true);
+				}
+				else if (move == 4) {
+					missileList.push_back(Missile(getNewId(), tankList[i]));
+					missileList.back().startup(myGraphics);
 				}
 			}
 		}
@@ -441,10 +449,11 @@ void updateSceneElements() {
 	// Calculate frame time/period -- used for all (physics, animation, logic, etc).
 	GLfloat currentTime = (GLfloat)glfwGetTime();    // retrieve timelapse
 	deltaTime = currentTime - lastTime;                // Calculate delta time
-	lastTime = currentTime;                            // Save for next frame calculations.
-	myDeltaTime += currentTime;
-	deltaTimeExplosion += currentTime;
+	                           // Save for next frame calculations.
+	myDeltaTime += (currentTime - lastTime) * 1000;
+	deltaTimeExplosion += currentTime - lastTime;
 	deltaTankSpawn += currentTime;
+	lastTime = currentTime;
 
 	// Do not forget your ( T * R * S ) http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 
@@ -470,7 +479,7 @@ void updateSceneElements() {
 	for (int i = 0; i < missileList.size(); i++) {
 		missileList[i].sceneUpdate(myGraphics);
 	}
-	cout << explosionList.size() << endl;
+
 	for (int i = 0; i < explosionList.size(); i++) {
 		explosionList[i].sceneUpdate(myGraphics);
 		if (explosionList[i].getParticleList().empty()) {
