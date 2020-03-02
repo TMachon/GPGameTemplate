@@ -188,10 +188,16 @@ void startup() {
 	Wall wall2 = Wall();
 	Wall wall3 = Wall();
 	Wall wall4 = Wall();
+	Wall obstacle1 = Wall();
+	Wall obstacle2 = Wall();
+	obstacle1.startup(myGraphics, 0.0f, 0.5f, 0.0f, 5.0f, 2.0f, 1.0f, false);
+	obstacle2.startup(myGraphics, 0.0f, 0.5f, -10.0f, 5.0f, 2.0f, 1.0f, false);
 	wall1.startup(myGraphics, 0.0f, 0.5f, 10.0f, 30.0f, 2.0f, 1.0f, false);
 	wall2.startup(myGraphics, -15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
 	wall3.startup(myGraphics, 0.0f, 0.5f, -20.0f, 30.0f, 2.0f, 1.0f, false);
 	wall4.startup(myGraphics, 15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
+	wallList.push_back(obstacle2);
+	wallList.push_back(obstacle1);
 	wallList.push_back(wall1);
 	wallList.push_back(wall2);
 	wallList.push_back(wall3);
@@ -237,13 +243,13 @@ void checkMissileCollision() {
 	/**/
 	vector<int> toRemove = vector<int>();
 	for (int i = 0; i < missileList.size(); i++) {
-		for (int j = 0; j < wallList.size(); j++) {
+		/*for (int j = 0; j < wallList.size(); j++) {
 			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
 				toRemove.push_back(missileList[i].getId());
 				explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
 				
 			}
-		}
+		}*/
 		for (int j = 0; j < tankList.size(); j++) {
 			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
 				toRemove.push_back(missileList[i].getId());
@@ -253,7 +259,7 @@ void checkMissileCollision() {
 			}
 		}
 	}
-	/**/
+	
 	for (int i = 0; i < toRemove.size(); i++) {
 		for (int j = 0; j < missileList.size(); j++) {
 			if (toRemove[i] == missileList[j].getId()) {
@@ -265,26 +271,22 @@ void checkMissileCollision() {
 }
 
 bool checkCollision(Tank tank) {
-	/**/
-	for (int i = 0; i < wallList.size(); i++) {
-		if (checkCollisionWall(tank, wallList[i])) {
-			return true;
-		}
-	}
-	/**/
+
 	for (int i = 0; i < tankList.size(); i++) {
 		if (tank.getId() != tankList[i].getId() && checkCollisionTank(tank, tankList[i])) {
 			return true;
 		}
 	}
-	/**/
-	if (!tank.isPlayer()) {
+	
+	/*if (!tank.isPlayer()) {
 		if (checkCollisionTank(tank, player)) {
 			return true;
 		}
 	}
 	/**/
+	
 	return false;
+
 }
 
 void updateCamera() {
@@ -438,6 +440,9 @@ void updateMovement() {
 			}
 		}
 	}
+
+	//USER UpdateScene
+	checkMissileCollision();
 }
 
 
@@ -464,8 +469,7 @@ void updateSceneElements() {
 		glm::mat4(1.0f);
 	myFloor.proj_matrix = myGraphics.proj_matrix;
 
-	//USER UpdateScene
-	checkMissileCollision();
+
 
 	player.sceneUpdate(myGraphics);
 	for (int i = 0; i < wallList.size(); i++) {
@@ -478,6 +482,10 @@ void updateSceneElements() {
 
 	for (int i = 0; i < missileList.size(); i++) {
 		missileList[i].sceneUpdate(myGraphics);
+		if (!missileList[i].isAlive()) {
+			explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
+			missileList.erase(missileList.begin() + i);
+		}
 	}
 
 	for (int i = 0; i < explosionList.size(); i++) {

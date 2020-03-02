@@ -37,6 +37,7 @@ public:
 	float getYSize();
 	float getZSize();
 	int getId();
+	bool isAlive();
 
 private:
 
@@ -48,6 +49,7 @@ private:
 	float z_size;
 	float velocity;
 	int id;
+	bool alive;
 };
 
 #endif

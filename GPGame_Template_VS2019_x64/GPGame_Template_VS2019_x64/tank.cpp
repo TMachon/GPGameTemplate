@@ -57,19 +57,31 @@ void Tank::move(int movement, bool updateMovement) {
 	if (updateMovement) last_movement = movement;
 
 	if (movement == UP) {
-		z += 0.01f;
+		if (z < 9.0f) {
+			z += 0.01f;
+		}
+		
 	}
 
 	if (movement == DOWN) {
-		z -= 0.01f;
+		if (z > -19.0f) {
+			z -= 0.01f;
+		}
+		
 	}
 
 	if (movement == RIGHT) {
-		x -= 0.01f;
+		
+		if (x > -14.0f) {
+			x -= 0.01f;
+		}
+		
 	}
 
 	if (movement == LEFT) {
-		x += 0.01f;
+		if (x < 14.0f) {
+			x += 0.01f;
+		}
 	}
 
 }

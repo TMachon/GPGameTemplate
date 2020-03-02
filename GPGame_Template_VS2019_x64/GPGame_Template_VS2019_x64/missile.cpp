@@ -16,11 +16,13 @@ Missile::Missile(int id_in, Tank tank) {
 
 	direction = tank.getLastMovement();
 	y = 1.25f;
-	velocity = 0.07f;
+	velocity = 0.15f;
 
 	x_size = y_size = z_size = 0.2f;
 
 	id = id_in;
+
+	alive = true;
 
 	if (direction == UP) {
 		x = tank.getX();
@@ -48,16 +50,40 @@ void Missile::startup(Graphics& myGraphics) {
 
 void Missile::sceneUpdate(Graphics& myGraphics) {
 	if (direction == UP) {
-		z += velocity;
+		if (z < 9.0f) {
+			z += velocity;
+		}
+		else {
+			alive = false;
+		}
+		
 	}
 	else if (direction == DOWN) {
-		z -= velocity;
+		if (z > -19.0f) {
+			z -= velocity;
+		}
+		else {
+			alive = false;
+		}
+		
 	}
 	else if (direction == RIGHT) {
-		x -= velocity;
+		if (x > -14.0f) {
+			x -= velocity;
+		}
+		else {
+			alive = false;
+		}
+		
 	}
 	else if (direction == LEFT) {
-		x += velocity;
+		if (x < 14.0f) {
+			x += velocity;
+		}
+		else {
+			alive = false;
+		}
+		
 	}
 	body.mv_matrix = myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
 		glm::mat4(1.0f) *
@@ -95,4 +121,8 @@ float Missile::getZSize() {
 
 int Missile::getId() {
 	return id;
+}
+
+bool Missile::isAlive() {
+	return alive;
 }
