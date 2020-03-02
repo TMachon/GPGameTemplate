@@ -23,16 +23,24 @@ Particule::Particule(float x_in, float y_in, float z_in) {
 void Particule::startup(Graphics& myGraphics) {
 
 	body.Load();
-	int r = rand() % 100 + 1;
-	int g = rand() % 100 + 1;
-	int b = rand() % 100 + 1;
-	body.fillColor = glm::vec4(r / 225.0f, 10.f / 225.0f, 10.0f / 255.0f, 1.0f);
+	int r, g, b;
+	r = g = b = 10.0f;
+	int color = rand() % 400 + 1;
+	if (color > 255.0f) {
+		r = color;
+		g = color - 255.0f;
+	}
+	else {
+		r = color;
+	}
+
+	body.fillColor = glm::vec4(r / 225.0f, g / 225.0f, b / 255.0f, 1.0f);
 }
 
 void Particule::sceneUpdate(Graphics& myGraphics) {
-	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
-	float rand_y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
-	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
+	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
+	float rand_y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
+	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
 
 	x = x + (rand_x - 1.0f) * velocity;
 	y = y + (rand_y - 1.0f) * velocity;
