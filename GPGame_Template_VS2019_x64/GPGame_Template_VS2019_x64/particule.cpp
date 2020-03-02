@@ -17,22 +17,33 @@ Particule::Particule(float x_in, float y_in, float z_in) {
 	y = y_in;
 	z = z_in;
 	velocity = 0.15f;
-	lifetime = rand() % 50;
-}
 
-void Particule::startup(Graphics& myGraphics) {
+	//Apply random lifetime
+	lifetime = rand() % 50;
 
 	body.Load();
-	int r = rand() % 100 + 1;
-	int g = rand() % 100 + 1;
-	int b = rand() % 100 + 1;
-	body.fillColor = glm::vec4(r / 225.0f, 10.f / 225.0f, 10.0f / 255.0f, 1.0f);
+	
+	// Apply random color to the particle
+	int r, g, b;
+	r = g = b = 10.0f;
+	int color = rand() % 400 + 1;
+	if (color > 255.0f) {
+		r = color;
+		g = color - 255.0f;
+	}
+	else {
+		r = color;
+	}
+
+	body.fillColor = glm::vec4(r / 225.0f, g / 225.0f, b / 255.0f, 1.0f);
 }
 
 void Particule::sceneUpdate(Graphics& myGraphics) {
-	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
-	float rand_y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
-	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX/2);
+
+	//Calculate random movement between 0.0f et 2.0f
+	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
+	float rand_y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
+	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
 
 	x = x + (rand_x - 1.0f) * velocity;
 	y = y + (rand_y - 1.0f) * velocity;
@@ -49,6 +60,8 @@ void Particule::sceneUpdate(Graphics& myGraphics) {
 void Particule::render() {
 	body.Draw();
 }
+
+//Getter
 
 float Particule::getX() {
 	return x;

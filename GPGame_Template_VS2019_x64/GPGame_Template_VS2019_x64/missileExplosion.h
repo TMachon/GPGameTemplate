@@ -20,8 +20,8 @@ using namespace std;
 class MissileExplosion {
 public:
 	MissileExplosion(float x, float y, float z, Graphics& myGraphics);
-	void sceneUpdate(Graphics& myGraphics);
-	void render();
+	void sceneUpdate(Graphics& myGraphics); //Update position particle list
+	void render();//Render particle
 	vector<Particule> getParticleList();
 
 private:

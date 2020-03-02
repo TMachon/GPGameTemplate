@@ -14,14 +14,16 @@
 #include "graphics.h"
 
 MissileExplosion::MissileExplosion(float x, float y, float z, Graphics& myGraphics) {
+	// Generate random number of particle for the explosion
 	int nb = 10+(rand() % 10);
+	//Populate the list
 	for (int i = 0; i < nb; i++) {
 		particuleList.push_back(Particule(x, y, z));
-		particuleList.back().startup(myGraphics);
 	}
 }
 
 void MissileExplosion::sceneUpdate(Graphics& myGraphics) {
+	//Update position particle list
 	for (int i = 0; i < particuleList.size(); i++) {
 		particuleList[i].sceneUpdate(myGraphics);
 		if (particuleList[i].getLifeTime() <= 0) {
@@ -31,6 +33,7 @@ void MissileExplosion::sceneUpdate(Graphics& myGraphics) {
 }
 
 void MissileExplosion::render() {
+	//render particle
 	for (int i = 0; i < particuleList.size(); i++) {
 		particuleList[i].render();
 	}

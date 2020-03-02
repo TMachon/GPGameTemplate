@@ -17,6 +17,7 @@ using namespace std;
 #include "graphics.h"
 #include "shapes.h"
 
+//Constant Missile direction
 #define UP 1
 #define DOWN 2
 #define RIGHT 3
@@ -27,9 +28,9 @@ class Missile {
 public:
 
 	Missile(int id, Tank tank);
-	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
+	//Getter
 	float getX();
 	float getY();
 	float getZ();
@@ -37,7 +38,7 @@ public:
 	float getYSize();
 	float getZSize();
 	int getId();
-	bool isAlive();
+	bool isAlive(); // is missile alive
 
 private:
 

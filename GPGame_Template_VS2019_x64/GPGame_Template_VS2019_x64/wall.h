@@ -20,9 +20,9 @@ class Wall {
 
 public:
 	Wall();
-	void startup(Graphics myGraphics, float x, float y, float z, float x_size, float y_size, float z_size, bool soft);
-	void sceneUpdate(Graphics myGraphics);
-	void render();
+	Wall(Graphics myGraphics, float x, float y, float z, float x_size, float y_size, float z_size, bool soft); //Initialize wall
+	void sceneUpdate(Graphics myGraphics); //Update position
+	void render(); // Render wall
 	float getX();
 	float getY();
 	float getZ();
@@ -30,6 +30,7 @@ public:
 	float getYSize();
 	float getZSize();
 
+	// get corner position in vector
 	glm::vec4 getTopLeft();
 	glm::vec4 getTopRight();
 	glm::vec4 getBottomLeft();

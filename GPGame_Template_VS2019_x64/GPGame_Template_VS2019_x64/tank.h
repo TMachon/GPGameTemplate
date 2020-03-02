@@ -16,23 +16,30 @@ using namespace std;
 #include "graphics.h"
 #include "shapes.h"
 
+//Constant for movement
 #define UP 1
 #define DOWN 2
 #define RIGHT 3
 #define LEFT 4
-#define MAX_MOVE 100
+
+#define MAX_MOVE 100 // Used for the ennemies tank
+
+/* Define how many movement do the ennemies tank
+/  in a direction before changing direction
+/  It makes the ennemies tank movement more realistic
+*/
 
 
 class Tank {
 
 public:
 	Tank();
-	Tank(int, float, float, float);
-	void move(int movement, bool updateMovement);
+	Tank(int, float, float, float, Graphics& myGraphics); //Constructor for player
+	Tank(int id_in, Graphics& myGraphics); // Constructor for ennemies tank
+	void move(int movement, bool updateMovement); // Move the tank
 	void moveDebug(int movement);
-	void startup(Graphics& myGraphics, bool player);
-	void sceneUpdate(Graphics& myGraphics);
-	void render();
+	void sceneUpdate(Graphics& myGraphics); // Update object
+	void render(); // Render object
 
 	//Getter
 	float getX();
@@ -44,7 +51,7 @@ public:
 	Cube  getBase();
 	Cube getHead();
 	Cube getCannon();
-	int getLastMovement();
+	int getLastMovement(); // Return the direction of last movement
 	int getSame();
 	int getId();
 	bool isPlayer();
@@ -60,18 +67,19 @@ private:
 	glm::mat4 getBaseMatrix();
 	glm::mat4 getHeadMatrix();
 	glm::mat4 getCannonMatrix();
-	Cube base;
+
+	//3 part of the tank
+	Cube base; // Tank hitbox
 	Cube head;
 	Cube cannon;
-	float x, y, z;
-	float x_size;
-	float y_size;
-	float z_size;
+
+	float x, y, z; //Tank position
+	float x_size, y_size, z_size; // Tank size (for the base cube)
 	glm::vec4 color;
 	int last_movement;
-	int same;
+	int same; //Use for ennemies tank 
 	int id;
-	bool player;
+	bool player; // Is tank player 
 };
 
 #endif

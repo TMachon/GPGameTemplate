@@ -1,5 +1,5 @@
-#ifndef PARTICULE_H_INCLUDED
-#define PARTICULE_H_INCLUDED
+#ifndef MISSILEGUIDING_H_INCLUDED
+#define MISSILEGUIDING_H_INCLUDED
 
 #pragma once
 
@@ -22,15 +22,12 @@ using namespace std;
 #define RIGHT 3
 #define LEFT 4
 
-#define X_SIZE 0.5f
-#define Y_SIZE 0.5f
-#define Z_SIZE 0.5f
-
-class Particule {
+class MissileGuiding {
 
 public:
 
-	Particule(float x_in, float y_in, float z_in);
+	MissileGuiding(int id, Tank tank, Tank player);
+	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
 	float getX();
@@ -40,16 +37,26 @@ public:
 	float getYSize();
 	float getZSize();
 	int getId();
-	int getLifeTime();
+	bool isAlive();
 
 private:
 
 	Cube body;
 	int direction;
 	float x, y, z;
+	float x_size;
+	float y_size;
+	float z_size;
+	float x_destination;
+	float y_destination;
+	float z_destination;
 	float velocity;
 	int id;
-	int lifetime;
+	bool alive;
+	bool goUp;
+	bool goDown;
+	bool goLeft;
+	bool goRight;
 };
 
 #endif

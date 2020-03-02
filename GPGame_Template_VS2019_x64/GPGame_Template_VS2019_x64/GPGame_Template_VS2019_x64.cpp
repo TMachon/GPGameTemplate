@@ -34,17 +34,20 @@ using namespace std;
 #include "missile.h"
 #include "particule.h"
 #include "missileExplosion.h"
+#include "missileGuiding.h"
 
 #define NB_WALLS 2
-#define MAX_TANK 3
+#define MAX_TANK 3 // Max tank that can appear on the map
 
 // MAIN FUNCTIONS
 void startup();
 void updateCamera();
-void updateMovement();
+void updateMovement(); // Update tank and missile movement
 void updateSceneElements();
 void renderScene();
-void spawnTank();
+void spawnTank(); // spawn tank if its possible
+int getNewId(); // Generate unique id for object
+
 
 
 // CALLBACK FUNCTIONS
@@ -71,20 +74,28 @@ Graphics    myGraphics;
 Cube        myFloor;
 
 //USER
-int getNewId();
-
 Tank		player;
 
-std::vector<Wall> wallList;
-std::vector<Tank> tankList;
+std::vector<Wall> wallList; // Wall list
+std::vector<Tank> tankList; // Ennemies tank list
 
 glm::vec3	defaultCameraPostion;
 GLfloat		defaultCameraPitch;
 
-std::vector<Missile> missileList;
-std::vector<MissileExplosion> explosionList;
+std::vector<Missile> missileList; // Missile list
+std::vector<MissileGuiding> guidedMissileList;
+std::vector<MissileExplosion> explosionList; // Explosion list
+
+Wall wall1;
+Wall wall2;
+Wall wall3;
+Wall wall4;
+
+int field[30][30];
 
 int id;
+
+
 
 // Some global variable to do the animation.
 float t = 0.001f;            // Global variable for animation
@@ -111,10 +122,9 @@ int main()
 	while (!quit) {
 
 		// Update the camera transform based on interactive inputs or by following a predifined path.
-		
-
 		updateCamera();
 
+		// Spawn ennemies tank on the map at random position
 		spawnTank();
 
 		updateMovement();
@@ -179,30 +189,41 @@ void startup() {
 	
 	//test = Tank();
 
+	/* Init tank player */
+	player = Tank(getNewId(), 0.0f, 0.5f, -15.0f, myGraphics);
 
-	player = Tank(getNewId(), 0.0f, 0.5f, -15.0f);
-	player.startup(myGraphics, true);
-	player.move(UP, true);
+	/* Init Wall that deimit the arena */
+	wall1 = Wall(myGraphics, 0.0f, 0.5f, 10.0f, 30.0f, 2.0f, 1.0f, false);
+	wall2 = Wall(myGraphics, -15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
+	wall3 = Wall(myGraphics, 0.0f, 0.5f, -20.0f, 30.0f, 2.0f, 1.0f, false);
+	wall4 = Wall(myGraphics, 15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
 
-	Wall wall1 = Wall();
-	Wall wall2 = Wall();
-	Wall wall3 = Wall();
-	Wall wall4 = Wall();
-	Wall obstacle1 = Wall();
-	Wall obstacle2 = Wall();
-	obstacle1.startup(myGraphics, 0.0f, 0.5f, 0.0f, 5.0f, 2.0f, 1.0f, false);
-	obstacle2.startup(myGraphics, 0.0f, 0.5f, -10.0f, 5.0f, 2.0f, 1.0f, false);
-	wall1.startup(myGraphics, 0.0f, 0.5f, 10.0f, 30.0f, 2.0f, 1.0f, false);
-	wall2.startup(myGraphics, -15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
-	wall3.startup(myGraphics, 0.0f, 0.5f, -20.0f, 30.0f, 2.0f, 1.0f, false);
-	wall4.startup(myGraphics, 15.0f, 0.5f, -5.0f, 1.0f, 2.0f, 30.0f, false);
-	wallList.push_back(obstacle2);
-	wallList.push_back(obstacle1);
-	wallList.push_back(wall1);
-	wallList.push_back(wall2);
-	wallList.push_back(wall3);
-	wallList.push_back(wall4);
+	//init obstacles at none
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 30; j++) {
+			field[i][j] = 0;
+		}
+	}
+
+	//placing obsatcles
+	field[20][20] = 1;
+	field[21][20] = 1;
+	field[22][20] = 1;
+	field[23][20] = 1;
+	field[24][20] = 1;
+	field[25][20] = 1;
+
+	//spawning obstacles
+	for (int i = 0; i < 30; i++) {
+		for (int j = 0; j < 30; j++) {
+			if (field[i][j] == 1) {
+				wallList.push_back(Wall(myGraphics, j - 15, 0.5f, i - 20, 1.0f, 1.0f, 1.0f, false));
+			}
+		}
+	}
 }
+
+
 
 bool checkCollisionTank(Tank tank1, Tank tank2) {
 	return (tank1.getX() + tank1.getXSize() / 2 > tank2.getX() - tank2.getXSize() / 2 &&
@@ -222,6 +243,26 @@ bool checkCollisionWall(Tank tank, Wall wall) {
 		tank.getZ() + tank.getZSize() / 2 > wall.getZ() - wall.getZSize() / 2 &&
 		tank.getZ() - tank.getZSize() / 2 < wall.getZ() + wall.getZSize() / 2);
 }
+
+bool checkCollision(Tank tank) {
+
+	for (int i = 0; i < tankList.size(); i++) {
+		if (tank.getId() != tankList[i].getId() && checkCollisionTank(tank, tankList[i])) {
+			return true;
+		}
+	}
+
+	if (!tank.isPlayer()) {
+		if (checkCollisionTank(tank, player)) {
+			return true;
+		}
+	}
+
+	return false;
+
+}
+
+
 
 bool checkCollisionMissileWall(Missile m, Wall w) {
 	return (m.getX() + m.getXSize() / 2 > w.getX() - w.getXSize() / 2 &&
@@ -243,13 +284,13 @@ void checkMissileCollision() {
 	/**/
 	vector<int> toRemove = vector<int>();
 	for (int i = 0; i < missileList.size(); i++) {
-		/*for (int j = 0; j < wallList.size(); j++) {
+		for (int j = 0; j < wallList.size(); j++) {
 			if (checkCollisionMissileWall(missileList[i], wallList[j])) {
 				toRemove.push_back(missileList[i].getId());
 				explosionList.push_back(MissileExplosion(missileList[i].getX(), missileList[i].getY(), missileList[i].getZ(), myGraphics));
-				
+
 			}
-		}*/
+		}
 		for (int j = 0; j < tankList.size(); j++) {
 			if (checkCollisionMissileTank(missileList[i], tankList[j])) {
 				toRemove.push_back(missileList[i].getId());
@@ -259,7 +300,7 @@ void checkMissileCollision() {
 			}
 		}
 	}
-	
+
 	for (int i = 0; i < toRemove.size(); i++) {
 		for (int j = 0; j < missileList.size(); j++) {
 			if (toRemove[i] == missileList[j].getId()) {
@@ -270,24 +311,52 @@ void checkMissileCollision() {
 	/**/
 }
 
-bool checkCollision(Tank tank) {
 
-	for (int i = 0; i < tankList.size(); i++) {
-		if (tank.getId() != tankList[i].getId() && checkCollisionTank(tank, tankList[i])) {
-			return true;
+
+bool checkCollisionMissileGWall(MissileGuiding m, Wall w) {
+	return (m.getX() + m.getXSize() / 2 > w.getX() - w.getXSize() / 2 &&
+		m.getX() - m.getXSize() / 2 < w.getX() + w.getXSize() / 2 &&
+		m.getZ() + m.getZSize() / 2 > w.getZ() - w.getZSize() / 2 &&
+		m.getZ() - m.getZSize() / 2 < w.getZ() + w.getZSize() / 2);
+}
+
+bool checkCollisionMissileGTank(MissileGuiding m, Tank t) {
+	return (m.getX() + m.getXSize() / 2 > t.getX() - t.getXSize() / 2 &&
+		m.getX() - m.getXSize() / 2 < t.getX() + t.getXSize() / 2 &&
+		m.getZ() + m.getZSize() / 2 > t.getZ() - t.getZSize() / 2 &&
+		m.getZ() - m.getZSize() / 2 < t.getZ() + t.getZSize() / 2);
+}
+
+
+void checkGuidedMissileCollision() {
+	/**/
+	vector<int> toRemove = vector<int>();
+	for (int i = 0; i < guidedMissileList.size(); i++) {
+		for (int j = 0; j < wallList.size(); j++) {
+			if (checkCollisionMissileGWall(guidedMissileList[i], wallList[j])) {
+				toRemove.push_back(guidedMissileList[i].getId());
+				explosionList.push_back(MissileExplosion(guidedMissileList[i].getX(), guidedMissileList[i].getY(), guidedMissileList[i].getZ(), myGraphics));
+
+			}
+		}
+		if (checkCollisionMissileGTank(guidedMissileList[i], player)) {
+			toRemove.push_back(guidedMissileList[i].getId());
+			explosionList.push_back(MissileExplosion(guidedMissileList[i].getX(), guidedMissileList[i].getY(), guidedMissileList[i].getZ(), myGraphics));
 		}
 	}
-	
-	/*if (!tank.isPlayer()) {
-		if (checkCollisionTank(tank, player)) {
-			return true;
+
+	for (int i = 0; i < toRemove.size(); i++) {
+		for (int j = 0; j < guidedMissileList.size(); j++) {
+			if (toRemove[i] == guidedMissileList[j].getId()) {
+				guidedMissileList.erase(guidedMissileList.begin() + j);
+			}
 		}
 	}
 	/**/
-	
-	return false;
+
 
 }
+
 
 void updateCamera() {
 
@@ -339,10 +408,7 @@ void updateCamera() {
 
 void spawnTank() {
 	if (tankList.size() < max_tank && deltaTankSpawn > 2000.0f) {
-		float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 13.0f;
-		float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 18.0f;
-		tankList.push_back(Tank(getNewId(), rand_x, 0.5f, rand_z));
-		tankList.back().startup(myGraphics, false);
+		tankList.push_back(Tank(getNewId(), myGraphics));
 		deltaTankSpawn = 0.0f;
 	}
 }
@@ -353,6 +419,7 @@ void updateMovement() {
 	//Player collision
 	// if there is a collision
 	if (checkCollision(player)) {
+		// if the player is colliding with push him 0.01f away in the other side
 		while (checkCollision(player)) {
 			if (player.getLastMovement() == DOWN) {
 				player.move(UP, false);
@@ -383,13 +450,11 @@ void updateMovement() {
 		else if (keyStatus[GLFW_KEY_LEFT]) {
 			player.move(LEFT, true);
 		}
-		//gcout << myDeltaTime << endl;
-		cooldown++;
+
+		cooldown++; // cooldown for launch missile
 		if (keyStatus[GLFW_KEY_SPACE] && cooldown > 100) {
-			//myDeltaTime = 0.0f;
-			cooldown = 0;
+			cooldown = 0; // reset cooldown
 			missileList.push_back(Missile(getNewId(), player));
-			missileList.back().startup(myGraphics);
 		}
 	}
 
@@ -434,8 +499,13 @@ void updateMovement() {
 					tankList[i].move(LEFT, true);
 				}
 				else if (move == 4) {
-					missileList.push_back(Missile(getNewId(), tankList[i]));
-					missileList.back().startup(myGraphics);
+					if (rand()%5 != 1) {
+						missileList.push_back(Missile(getNewId(), tankList[i]));
+					}
+					else {
+						guidedMissileList.push_back(MissileGuiding(getNewId(), tankList[i], player));
+						guidedMissileList.back().startup(myGraphics);
+					}
 				}
 			}
 		}
@@ -443,6 +513,7 @@ void updateMovement() {
 
 	//USER UpdateScene
 	checkMissileCollision();
+	checkGuidedMissileCollision();
 }
 
 
@@ -469,9 +540,14 @@ void updateSceneElements() {
 		glm::mat4(1.0f);
 	myFloor.proj_matrix = myGraphics.proj_matrix;
 
-
+	/**        Update Game Object (tank, wall, explosion particleand guided missile)              **/
+	wall1.sceneUpdate(myGraphics);
+	wall2.sceneUpdate(myGraphics);
+	wall3.sceneUpdate(myGraphics);
+	wall4.sceneUpdate(myGraphics);
 
 	player.sceneUpdate(myGraphics);
+
 	for (int i = 0; i < wallList.size(); i++) {
 		wallList[i].sceneUpdate(myGraphics);
 	}
@@ -488,12 +564,21 @@ void updateSceneElements() {
 		}
 	}
 
+	for (int i = 0; i < guidedMissileList.size(); i++) {
+		guidedMissileList[i].sceneUpdate(myGraphics);
+		if (!guidedMissileList[i].isAlive()) {
+			explosionList.push_back(MissileExplosion(guidedMissileList[i].getX(), guidedMissileList[i].getY(), guidedMissileList[i].getZ(), myGraphics));
+			guidedMissileList.erase(guidedMissileList.begin() + i);
+		}
+	}
+
 	for (int i = 0; i < explosionList.size(); i++) {
 		explosionList[i].sceneUpdate(myGraphics);
 		if (explosionList[i].getParticleList().empty()) {
 			explosionList.erase(explosionList.begin() + i);
 		}
 	}
+	/**                                                                                            **/
 
 	t += 0.01f; // increment movement variable
 
@@ -508,7 +593,7 @@ void renderScene() {
 	// Draw objects in screen
 	myFloor.Draw();
 
-	//USER
+	/**         Render Game Object (tank, wall, explosion particleand guided missile)               **/
 	player.render();
 	for (int i = 0; i < wallList.size(); i++) {
 		wallList[i].render();
@@ -525,6 +610,15 @@ void renderScene() {
 	for (int i = 0; i < explosionList.size(); i++) {
 		explosionList[i].render();
 	}
+
+	for (int i = 0; i < guidedMissileList.size(); i++) {
+		guidedMissileList[i].render();
+	}
+
+	wall1.render();
+	wall2.render();
+	wall3.render();
+	wall4.render();
 }
 
 
