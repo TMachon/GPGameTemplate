@@ -19,7 +19,11 @@ Tank::Tank() {
 
 }
 
-Tank::Tank(int id_in, float x_int, float y_int, float z_int) {
+//Player constructor
+Tank::Tank(int id_in, float x_int, float y_int, float z_int, Graphics& myGraphics) {
+
+	//Init tank position
+
 	x = x_int;
 	y = y_int;
 	z = z_int;
@@ -31,56 +35,89 @@ Tank::Tank(int id_in, float x_int, float y_int, float z_int) {
 	same = 0;
 
 	id = id_in;
-}
 
-void Tank::startup(Graphics& myGraphics, bool player_in) {
+	player = true;
+	color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f); // Define bright color for the player tank
 
-	player = player_in;
-	if (player) {
-		color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f);
-	}
-	else {
-		color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f);
-	}
-
+	// Load the 3 part of the tank
 	base.Load();
 	head.Load();
 	cannon.Load();
 
+	// Fill the same color for all part
 	base.fillColor = color;
 	head.fillColor = color;
 	cannon.fillColor = color;
+	last_movement = UP; // Initialize last_movement
+}
+
+//Ennemies tank constructor
+Tank::Tank(int id_in, Graphics& myGraphics) {
+
+	//Init tank random position
+	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 13.0f;
+	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 18.0f;
+	x = rand_x;
+	y = 0.5f;
+	z = rand_z;
+
+	x_size = 1.0f;
+	y_size = 1.0f;
+	z_size = 1.0f;
+
+	same = 0;
+
+	id = id_in;
+
+	player = false;
+	
+	color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f); // Define dark color for the ennemies tank
+	
+
+	//Load the 3 part of the tank
+	base.Load();
+	head.Load();
+	cannon.Load();
+
+	//Fill the same color for all part
+	base.fillColor = color;
+	head.fillColor = color;
+	cannon.fillColor = color;
+	last_movement = UP; // Initialize last_movement
 }
 
 void Tank::move(int movement, bool updateMovement) {
 
-	if (updateMovement) last_movement = movement;
+	if (updateMovement) last_movement = movement; // save the movement
 
 	if (movement == UP) {
+		//Check for out of band the arena
 		if (z < 9.0f) {
-			z += 0.01f;
+			z += 0.05f;
 		}
 		
 	}
 
 	if (movement == DOWN) {
+		//Check for out of band the arena
 		if (z > -19.0f) {
-			z -= 0.01f;
+			z -= 0.05f;
 		}
 		
 	}
 
 	if (movement == RIGHT) {
-		
+		//Check for out of band the arena
 		if (x > -14.0f) {
-			x -= 0.01f;
+			x -= 0.05f;
 		}
 		
 	}
 
 	if (movement == LEFT) {
+		//Check for out of band the arena
 		if (x < 14.0f) {
-			x += 0.01f;
+			x += 0.05f;
 		}
 	}
 
@@ -110,6 +147,7 @@ void Tank::moveDebug(int movement) {
 
 void Tank::sceneUpdate(Graphics& myGraphics) {
 
+	//Update tank position
 	base.mv_matrix = myGraphics.viewMatrix * glm::translate(glm::vec3(x, y, z)) *
 		glm::mat4(1.0f) *
 		glm::scale(glm::vec3(x_size, y_size, z_size)); 
@@ -125,11 +163,14 @@ void Tank::sceneUpdate(Graphics& myGraphics) {
 
 void Tank::render() {
 
+	//Draw different part
 	base.Draw();
 	head.Draw();
 	cannon.Draw();
 
 }
+
+/** Getter **/
 
 float Tank::getX() {
 	return x;
@@ -155,14 +196,9 @@ float Tank::getZSize() {
 	return z_size;
 }
 
-void Tank::setPosition(float x_in, float y_in, float z_in) {
-	x = x_in;
-	y = y_in;
-	z = z_in;
+int Tank::getSame() {
+	return same;
 }
-
-
-// PRIVATE
 
 glm::mat4 Tank::getBaseMatrix() {
 	glm::mat4 matrix = glm::translate(glm::vec3(x, y, z)) *
@@ -222,27 +258,30 @@ int Tank::getLastMovement() {
 	return last_movement;
 }
 
-void Tank::resetSame() {
-	same = 0;
-}
-
-int Tank::getSame() {
-	return same;
-}
-
-void Tank::setLastMovement(int movement) {
-	last_movement = movement;
-}
-
-void Tank::incSame() {
-	same++;
-}
-
-
 int Tank::getId() {
 	return id;
 }
 
 bool Tank::isPlayer() {
 	return player;
+}
+
+void Tank::resetSame() {
+	same = 0;
+}
+
+//Setter
+
+void Tank::setPosition(float x_in, float y_in, float z_in) {
+	x = x_in;
+	y = y_in;
+	z = z_in;
+}
+
+void Tank::setLastMovement(int movement) {
+	last_movement = movement;
+}
+//Increase same variable 
+void Tank::incSame() {
+	same++;
 }

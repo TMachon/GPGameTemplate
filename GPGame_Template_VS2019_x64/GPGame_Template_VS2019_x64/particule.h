@@ -31,7 +31,6 @@ class Particule {
 public:
 
 	Particule(float x_in, float y_in, float z_in);
-	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
 	float getX();

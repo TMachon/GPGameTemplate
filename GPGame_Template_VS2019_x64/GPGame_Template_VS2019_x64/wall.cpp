@@ -16,8 +16,7 @@ Wall::Wall() {
 
 }
 
-void Wall::startup(Graphics myGraphics, float x_in, float y_in, float z_in, float x_size_in, float y_size_in, float z_size_in, bool soft_in) {
-
+Wall::Wall(Graphics myGraphics, float x_in, float y_in, float z_in, float x_size_in, float y_size_in, float z_size_in, bool soft_in) {
 	x_wall = x_in;
 	y_wall = y_in;
 	z_wall = z_in;

@@ -17,12 +17,13 @@ Particule::Particule(float x_in, float y_in, float z_in) {
 	y = y_in;
 	z = z_in;
 	velocity = 0.15f;
-	lifetime = rand() % 50;
-}
 
-void Particule::startup(Graphics& myGraphics) {
+	//Apply random lifetime
+	lifetime = rand() % 50;
 
 	body.Load();
+	
+	// Apply random color to the particle
 	int r, g, b;
 	r = g = b = 10.0f;
 	int color = rand() % 400 + 1;
@@ -38,6 +39,8 @@ void Particule::startup(Graphics& myGraphics) {
 }
 
 void Particule::sceneUpdate(Graphics& myGraphics) {
+
+	//Calculate random movement between 0.0f et 2.0f
 	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
 	float rand_y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
 	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 2);
@@ -57,6 +60,8 @@ void Particule::sceneUpdate(Graphics& myGraphics) {
 void Particule::render() {
 	body.Draw();
 }
+
+//Getter
 
 float Particule::getX() {
 	return x;
