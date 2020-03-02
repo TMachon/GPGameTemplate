@@ -365,6 +365,12 @@ void spawnTank() {
 					break;
 				}
 			}
+			for (int i = 0; i < wallList.size(); i++) {
+				if (rand_x < wallList[i].getX() + 1.0f && rand_x > wallList[i].getX() - 1.0f && rand_z < wallList[i].getZ() + 1.0f && rand_z > wallList[i].getZ() - 1.0f) {
+					okToSpawn = false;
+					break;
+				}
+			}
 		}
 	
 		tankList.push_back(Tank(getNewId(), rand_x, 0.5f, rand_z, myGraphics, false));
@@ -517,7 +523,7 @@ void updateMovement() {
 						missileList.push_back(Missile(getNewId(), tankList[i]));
 					}
 					else {
-						guidedMissileList.push_back(MissileGuiding(getNewId(), tankList[i], player));
+						guidedMissileList.push_back(MissileGuiding(getNewId(), tankList[i], player, field));
 						guidedMissileList.back().startup(myGraphics);
 					}
 				}

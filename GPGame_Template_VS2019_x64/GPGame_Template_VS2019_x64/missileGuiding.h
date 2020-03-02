@@ -26,7 +26,7 @@ class MissileGuiding {
 
 public:
 
-	MissileGuiding(int id, Tank tank, Tank player);
+	MissileGuiding(int id_in, Tank tank, Tank target, int field[30][30]);
 	void startup(Graphics& myGraphics);
 	void sceneUpdate(Graphics& myGraphics);
 	void render();
@@ -47,9 +47,6 @@ private:
 	float x_size;
 	float y_size;
 	float z_size;
-	float x_destination;
-	float y_destination;
-	float z_destination;
 	float velocity;
 	int id;
 	bool alive;
@@ -57,6 +54,9 @@ private:
 	bool goDown;
 	bool goLeft;
 	bool goRight;
+	vector<float> x_steps;
+	vector<float> z_steps;
+
 };
 
 #endif
