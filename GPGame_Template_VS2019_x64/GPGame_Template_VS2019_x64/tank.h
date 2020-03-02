@@ -34,8 +34,7 @@ class Tank {
 
 public:
 	Tank();
-	Tank(int, float, float, float, Graphics& myGraphics); //Constructor for player
-	Tank(int id_in, Graphics& myGraphics); // Constructor for ennemies tank
+	Tank(int, float, float, float, Graphics& myGraphics, bool player); //Constructor for player
 	void move(int movement, bool updateMovement); // Move the tank
 	void moveDebug(int movement);
 	void sceneUpdate(Graphics& myGraphics); // Update object
@@ -48,7 +47,7 @@ public:
 	float getXSize();
 	float getYSize();
 	float getZSize();
-	Cube  getBase();
+	Cube getBase();
 	Cube getHead();
 	Cube getCannon();
 	int getLastMovement(); // Return the direction of last movement

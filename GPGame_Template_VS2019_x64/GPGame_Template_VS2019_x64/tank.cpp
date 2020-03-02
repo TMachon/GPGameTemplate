@@ -20,7 +20,7 @@ Tank::Tank() {
 }
 
 //Player constructor
-Tank::Tank(int id_in, float x_int, float y_int, float z_int, Graphics& myGraphics) {
+Tank::Tank(int id_in, float x_int, float y_int, float z_int, Graphics& myGraphics, bool player_in) {
 
 	//Init tank position
 
@@ -36,8 +36,9 @@ Tank::Tank(int id_in, float x_int, float y_int, float z_int, Graphics& myGraphic
 
 	id = id_in;
 
-	player = true;
-	color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f); // Define bright color for the player tank
+	player = player_in;
+	if (player) color = glm::vec4(150.0f / 225.0f, 172.0f / 225.0f, 160.0f / 225.0f, 1.0f); // Define bright color for the player tank
+	else color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f); // Define dark color for the ennemies tank
 
 	// Load the 3 part of the tank
 	base.Load();
@@ -45,41 +46,6 @@ Tank::Tank(int id_in, float x_int, float y_int, float z_int, Graphics& myGraphic
 	cannon.Load();
 
 	// Fill the same color for all part
-	base.fillColor = color;
-	head.fillColor = color;
-	cannon.fillColor = color;
-	last_movement = UP; // Initialize last_movement
-}
-
-//Ennemies tank constructor
-Tank::Tank(int id_in, Graphics& myGraphics) {
-
-	//Init tank random position
-	float rand_x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 13.0f;
-	float rand_z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 26) - 18.0f;
-	x = rand_x;
-	y = 0.5f;
-	z = rand_z;
-
-	x_size = 1.0f;
-	y_size = 1.0f;
-	z_size = 1.0f;
-
-	same = 0;
-
-	id = id_in;
-
-	player = false;
-	
-	color = glm::vec4(50.0f / 225.0f, 52.0f / 225.0f, 60.0f / 225.0f, 1.0f); // Define dark color for the ennemies tank
-	
-
-	//Load the 3 part of the tank
-	base.Load();
-	head.Load();
-	cannon.Load();
-
-	//Fill the same color for all part
 	base.fillColor = color;
 	head.fillColor = color;
 	cannon.fillColor = color;
